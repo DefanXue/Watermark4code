@@ -1,10 +1,14 @@
-public static String GetRequestPath(HttpRequest req) {
-    StringBuilder buff = new StringBuilder();
-    if (req.getPath() != null) {
-      buff.append(req.getPath());
+public static String getRequestPath(HttpServletRequest req) {
+    String servletPath = req.getServletPath();
+    String pathInfo = req.getPathInfo();
+    int cap = (servletPath != null ? servletPath.length() : 0) +
+              (pathInfo != null ? pathInfo.length() : 0);
+    StringBuilder buff = new StringBuilder(cap);
+    if (servletPath != null) {
+        buff.append(servletPath);
     }
-    if (req.getPathBase() != null) {
-      buff.append(req.getPathBase());
+    if (pathInfo != null) {
+        buff.append(pathInfo);
     }
     return buff.toString();
   }

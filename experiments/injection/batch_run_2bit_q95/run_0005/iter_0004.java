@@ -1,29 +1,50 @@
-public static double handleDistance( obj_34 arg_59, tmp_24 var_17 ) {
-		double APx =  var_17.x -  arg_59.a.x; 
-		double APy = var_17.y - arg_59.a.y;
-		double APz = var_17.z - arg_59.a.z;
+public static double distance(LineSegment3D_F64 l, Point3D_F64 p) {
+    // Vector from A to P
+    double dx = p.x - l.a.x;
+    double dy = p.y - l.a.y;
+    double dz = p.z - l.a.z;
 
-  		double AP2 = APx*APx + APy*APy + APz*APz;
+    // Squared distance from A to P
+    double ap2 = dx*dx + dy*dy + dz*dz;
 
-		double ABx = arg_59.b.x - arg_59.a.x;
- 		double ABy = arg_59.b.y - arg_59.a.y;
-		double ABz = arg_59.b.z - arg_59.a.z;
+    // Vector from A to B
+    double vx = l.b.x - l.a.x;
+    double vy = l.b.y - l.a.y;
+    double vz = l.b.z - l.a.z;
 
-		double AB2 = ABx*ABx + ABy*ABy + ABz*ABz;
-		double ABlen = Math.sqrt(AB2);
+    // Length of AB
+    double len = Math.sqrt(vx*vx + vy*vy + vz*vz);
 
-		double t = (ABx*APx + ABy*APy + ABz*APz) / ABlen;
+    // Degenerate segment check
+    if (len == 0.0) {
+        double adx = p.x - l.a.x;
+        double ady = p.y - l.a.y;
+        double adz = p.z - l.a.z;
+        return Math.sqrt(adx*adx + ady*ady + adz*adz);
+    }
 
-		if( t <= 0 )
-			return var_17.handleDistance(arg_59.a);
-		else if( t >=  ABlen )
- 			return var_17.handleDistance(arg_59.b);
+    // Projection of AP onto AB, in units of AB length
+    double t = (vx*dx + vy*dy + vz*dz) / len;
 
-		double distSq =  AP2 -  t* t; 
+    // Check end points
+    if (t <= 0.0) {
+        double adx = p.x - l.a.x;
+        double ady = p.y - l.a.y;
+        double adz = p.z - l.a.z;
+        return Math.sqrt(adx*adx + ady*ady + adz*adz);
+    } else if (t >= len) {
+        double bdx = p.x - l.b.x;
+        double bdy = p.y - l.b.y;
+        double bdz = p.z - l.b.z;
+        return Math.sqrt(bdx*bdx + bdy*bdy + bdz*bdz);
+    }
 
-		if( distSq <  0 ){
-			return 0.0;
-		} else {
-			return Math.sqrt(distSq);
-		}
-	}
+    double distanceSq = ap2 - t*t;
+
+    // round off error can make distanceSq go negative when it is very close to zero
+    if (distanceSq < 0.0) {
+        return 0.0;
+    } else {
+        return Math.sqrt(distanceSq);
+    }
+}

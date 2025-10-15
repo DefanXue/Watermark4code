@@ -1,6 +1,5 @@
 protected NumericType Evaluate(NumericType firstNumber, NumericType secondNumber)
 {
-    // Integer inputs: perform exponentiation by squaring; otherwise result is 1
     if (firstNumber.IsInteger() && secondNumber.IsInteger())
     {
         long n1 = firstNumber.LongValue();
@@ -21,7 +20,7 @@ protected NumericType Evaluate(NumericType firstNumber, NumericType secondNumber
                     value *= baseVal;
                 }
                 baseVal *= baseVal;
-                exp = exp >> 1;
+                exp >>= 1;
             }
             result = value;
         }

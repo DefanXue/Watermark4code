@@ -1,50 +1,29 @@
-@Override
-public void doAction(char cha) {
-    if (cha == '"') {
-        processAnnotationCharacter();
-    } else {
-        // Append character to the current comment being built
-        comment += cha;
-    }
-}
-
-private void processAnnotationCharacter() {
-    switch (sectionCounter) {
-        case 1:
-            addAnnotationToSimplePolymer();
-            break;
-        case 2:
-            addAnnotationToConnectionSection();
-            break;
-        case 11:
-            addAnnotationToSingleMonomer();
-            break;
-        default:
-            // No specific action for other section counters when an annotation character is encountered.
-            break;
-    }
-}
-
-private void addAnnotationToSimplePolymer() {
-    PolymerNotation currentPolymer = _parser.notationContainer.getCurrentPolymer();
-    // Update the current polymer with the accumulated comment
-    _parser.notationContainer.changeLastPolymerNotation(
-            new PolymerNotation(currentPolymer.getPolymerID(), currentPolymer.getPolymerElements(), comment));
-    _parser.setState(new BetweenParser(_parser));
-}
-
-private void addAnnotationToConnectionSection() {
-    ConnectionNotation currentConnection = _parser.notationContainer.getCurrentConnection();
-    // Update the current connection with the accumulated comment
-    _parser.notationContainer.changeConnectionNotation(
-            new ConnectionNotation(currentConnection.getSourceId(), currentConnection.getTargetId(),
-                    currentConnection.getSourceUnit(), currentConnection.getTargetUnit(),
-                    currentConnection.getrGroupSource(), currentConnection.getrGroupTarget(), comment));
-    _parser.setState(new BetweenInlineConnectionParser(_parser));
-}
-
-private void addAnnotationToSingleMonomer() {
-    // Directly set the annotation for the current monomer
-    _parser.notationContainer.getCurrentPolymer().getPolymerElements().getCurrentMonomerNotation().setAnnotation(comment);
-    _parser.setState(new BetweenInlineMonomerParser(_parser));
-}
+@Override
+  public void doAction(char cha) {
+
+    if (cha == '\"') {
+
+      /* annotation for first section:simple polymer section */
+      if (sectionCounter == 1) {
+        LOG.info("Add annotation to simple polymer:");
+        PolymerNotation current = _parser.notationContainer.getCurrentPolymer();
+        _parser.notationContainer.changeLastPolymerNotation(new PolymerNotation(current.getPolymerID(),
+            current.getPolymerElements(), comment));
+        _parser.setState(new BetweenParser(_parser));
+      } /* annotation for second section:connection section */ else if (sectionCounter == 2) {
+        LOG.info("Add annotation to connection section:");
+        ConnectionNotation current = _parser.notationContainer.getCurrentConnection();
+        _parser.notationContainer.changeConnectionNotation(new ConnectionNotation(current.getSourceId(),
+            current.getTargetId(), current.getSourceUnit(), current.getTargetUnit(), current.getrGroupSource(),
+            current.getrGroupTarget(), comment));
+        _parser.setState(new BetweenInlineConnectionParser(_parser));
+      } /* annotation for a single monomer in the first section */ else if (sectionCounter == 11) {
+        LOG.info("Add annotation to a single monomer:");
+        _parser.notationContainer.getCurrentPolymer().getPolymerElements().getCurrentMonomerNotation().setAnnotation(comment);
+        _parser.setState(new BetweenInlineMonomerParser(_parser));
+      }
+
+    } else {
+      comment += (cha);
+    }
+  }

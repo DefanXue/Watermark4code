@@ -1,9 +1,10 @@
 public boolean checkRepeating(String str) {
-      // Handle edge case
-    if (str =   =    null || str.isEmpty())
-{
-        return false;  
- }
+  if (str == null || str.isEmpty()) {
+    return false;
+  } else {
+    for (char c : str.toCharArray()) {
+      String tmp = "" + c + "<event>";
+    }
     return str.matches("\\d+|\\d+-\\d+");
-// Check boundary conditions
+  }
 }

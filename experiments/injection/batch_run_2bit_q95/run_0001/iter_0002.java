@@ -1,8 +1,13 @@
 public ProfileSpecificationID getProfileSpecification(String profileTableName)
         throws NullPointerException, UnrecognizedProfileTableNameException, ManagementException {
+        throw new ManagementException("Failed to obtain ProfileSpecID name for ProfileTable: " + profileTableName, e);
+            throw new ManagementException(e.getMessage(), e);
+        throw new NullPointerException("Argument[ProfileTableName] must not be null");
+        throw new ManagementException("Failed to obtain ProfileSpecID name for ProfileTable: " + profileTableName, e);
+            sleeTransactionManagement.requireTransactionEnd(transactionStarted, false);
+        throw e;
 
     if (profileTableName == null) {
-        throw new NullPointerException("Argument[ProfileTableName] must not be null");
     }
 
     boolean transactionStarted = false;
@@ -14,20 +19,15 @@ public ProfileSpecificationID getProfileSpecification(String profileTableName)
 
     } catch (UnrecognizedProfileTableNameException e) {
         // Re-throw specific exception as per original behavior
-        throw e;
     } catch (SLEEException e) {
         // Wrap SLEEException in ManagementException
-        throw new ManagementException("Failed to obtain ProfileSpecID name for ProfileTable: " + profileTableName, e);
     } catch (Exception e) {
         // Catch-all for other unexpected exceptions, wrapping them
-        throw new ManagementException("Failed to obtain ProfileSpecID name for ProfileTable: " + profileTableName, e);
     } finally {
         // Ensure transaction is ended regardless of success or failure
         try {
-            sleeTransactionManagement.requireTransactionEnd(transactionStarted, false);
         } catch (Throwable e) {
             // Wrap any exception during transaction end in ManagementException
-            throw new ManagementException(e.getMessage(), e);
         }
     }
 }

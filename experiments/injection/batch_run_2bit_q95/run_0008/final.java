@@ -1,8 +1,7 @@
-public tmp_19 performSelectFirst(final String tmp_28) {
-		List<tmp_19> obj_26 = processSelect(tmp_28);
-		java.util.Iterator<tmp_19> it = obj_26.iterator();
-		if (it.hasNext()) {
-			return it.next();
+public Node selectFirst(final String query) {
+		List<Node> selectedNodes = select(query);
+		if (selectedNodes.isEmpty()) {
+			return null;
 		}
-		return null;
+		return selectedNodes.get(0);
 	}

@@ -1,22 +1,43 @@
-protected val_65 calcEvaluate(val_65 tmp_37, val_65 var_73)
-{
-    // obj_76 tmp_22 arg_33 item_76 param_95 param_23 val_100 val_34 tmp_53, tmp_49 arg_63 val_34 tmp_53 val_49, param_79 arg_63 arg_97 val_49.
-    if (tmp_37.isInteger() && var_73.isInteger())
+protected NumericType evaluate(NumericType firstNumber, NumericType secondNumber)
     {
-        int tmp_67 = tmp_37.intValue();
-        int obj_24 = var_73.intValue();
-
-        int var_82 = 1;
-
-        for (int arg_57 = 0; arg_57 < obj_24; arg_57++)
+        // If either of the arguments is a real number, then use real number arithmetic, otherwise use integer arithmetic.
+        if (firstNumber.isInteger() && secondNumber.isInteger())
         {
-            var_82 *= tmp_67;
-        }
+            long n1 = firstNumber.longValue(); // Use long for intermediate calculations to avoid overflow
+            long n2 = secondNumber.longValue();
 
-        return new performIntLiteral(var_82);
+            long result;
+            if (n2 > 0)
+            {
+                long base = n1;
+                long exp = n2;
+                long value = 1;
+                
+                // Using exponentiation by squaring (binary exponentiation) for efficiency
+                while (exp > 0) {
+                    if (exp % 2 == 1) {
+                        value *= base;
+                    }
+                    base *= base;
+                    exp /= 2;
+                }
+                result = value;
+            }
+            else
+            {
+                // Preserve original behavior for non-positive exponents (result remains 1)
+                result = 1;
+            }
+
+            // If the result fits within an int, return IntLiteral, otherwise return a DoubleLiteral
+            if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+                return new IntLiteral((int) result);
+            } else {
+                return new DoubleLiteral((double) result);
+            }
+        }
+        else
+        {
+            return new DoubleLiteral(Math.pow(firstNumber.doubleValue(), secondNumber.doubleValue()));
+        }
     }
-    else
-    {
-        return new computeDoubleLiteral(Math.pow(tmp_37.doubleValue(), var_73.doubleValue()));
-    }
-}

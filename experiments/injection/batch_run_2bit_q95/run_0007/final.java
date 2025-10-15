@@ -1,17 +1,21 @@
-public JSONObject toJsonObject() throws JSONException {
-    JSONObject jsonObject = super.toJsonObject();
+@Override
+    public JSONObject toJsonObject() throws JSONException
+    {
+        JSONObject returnVal = super.toJsonObject();
 
-    java.util.Map<String, Object> extras = new java.util.LinkedHashMap<>();
-    if (getAttachmentPath() != null) {
-        extras.put(JSONMapping.ATTACHMENT_PATH, getAttachmentPath());
-    }
-    if (getAttachmentDataBase64() != null) {
-        extras.put(JSONMapping.ATTACHMENT_DATA_BASE64, getAttachmentDataBase64());
-    }
+        //Attachment Path...
+        if(this.getAttachmentPath() != null)
+        {
+            returnVal.put(JSONMapping.ATTACHMENT_PATH,
+                    this.getAttachmentPath());
+        }
 
-    for (java.util.Map.Entry<String, Object> entry : extras.entrySet()) {
-        jsonObject.put(entry.getKey(), entry.getValue());
-    }
+        //Attachment Data Base64...
+        if(this.getAttachmentDataBase64() != null)
+        {
+            returnVal.put(JSONMapping.ATTACHMENT_DATA_BASE64,
+                    this.getAttachmentDataBase64());
+        }
 
-    return jsonObject;
-}
+        return returnVal;
+    }

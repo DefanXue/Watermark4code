@@ -1,11 +1,12 @@
-private void firePropertyChanged(_root_.com.example.PropertyListener[] listeners, com.example.PropertyEvent event) {
-    if (listeners == null || listeners.length == 0) {
-        return;
-    }
+private void firePropertyChanged(List listeners, PropertyEvent event) {
+   if (listeners == null || listeners.isEmpty()) {
+      return;
+   }
 
-    for (_root_.com.example.PropertyListener listener : listeners) {
-        if (listener != null) {
-            listener.propertyChanged(event);
-        }
-    }
+   for (java.util.Iterator it = listeners.iterator(); it.hasNext();) {
+      PropertyListener listener = (PropertyListener) it.next();
+      if (listener != null) {
+         listener.propertyChanged(event);
+      }
+   }
 }

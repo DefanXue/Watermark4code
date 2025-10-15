@@ -21,7 +21,7 @@ protected NumericType Evaluate(NumericType firstNumber, NumericType secondNumber
                     value *= baseVal;
                 }
                 baseVal *= baseVal;
-                exp = exp >> 1;
+                exp >>= 1;
             }
             result = value;
         }

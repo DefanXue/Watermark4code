@@ -1,9 +1,11 @@
-private void firePropertyChanged(_root_.com.example.PropertyListener[] listeners, com.example.PropertyEvent event) {
-    if (listeners == null) {
-        return;
-    }
+private void firePropertyChanged(List listeners, PropertyEvent event) {
+   if (listeners == null || listeners.isEmpty()) {
+      return;
+   }
 
-    for (_root_.com.example.PropertyListener listener : listeners) {
-        listener.propertyChanged(event);
-    }
+   for (PropertyListener listener : listeners) {
+      if (listener != null) {
+         listener.propertyChanged(event);
+      }
+   }
 }

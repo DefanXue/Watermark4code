@@ -15,6 +15,21 @@ from ..api import load_encoder, compute_baseline_s0
 from ..encoder import embed_codes
 from ..keys import derive_directions
 from ..utils import project_embeddings
+import sys
+
+
+def _ensure_srcmarker_on_path() -> None:
+    """确保优先解析 XDF/SrcMarker-main 下的 contrastive_learning。"""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    xdf_root = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
+    srcmarker_root = os.path.join(xdf_root, "SrcMarker-main")
+    if srcmarker_root in sys.path:
+        sys.path.remove(srcmarker_root)
+    sys.path.insert(0, srcmarker_root)
+
+
+_ensure_srcmarker_on_path()
+
 from contrastive_learning.java_augmentor import generate_java_training_data_parallel  # type: ignore
 
 
@@ -41,30 +56,24 @@ def _get_quantile_entry(obj: Dict, q: float):
     return None
 
 
-def compute_required_delta(epsilon_json_path: str, tmargin_json_path: str, quantile: float = 0.90) -> List[float]:
+def compute_required_delta(epsilon_json_path: str, tmargin_json_path: str, quantile: float = 0.90) -> float:
     with open(epsilon_json_path, "r", encoding="utf-8") as f:
         eps_obj = json.load(f)
     with open(tmargin_json_path, "r", encoding="utf-8") as f:
         tm_obj = json.load(f)
 
-    # epsilon per-bit
+    # epsilon: quantiles hold floats
     eps_entry = _get_quantile_entry(eps_obj, quantile)
-    if isinstance(eps_entry, dict) and "per_bit" in eps_entry:
-        eps_vec = [float(x) for x in eps_entry["per_bit"]]
-    else:
-        # 若不存在 per_bit，回退为 4 维同值（不保留历史，只为兼容极端情况）
-        scalar = float(eps_obj.get("epsilon_emp", 0.0)) if not isinstance(eps_entry, (list, tuple)) else float(eps_entry)
-        eps_vec = [scalar, scalar, scalar, scalar]
+    eps = float(eps_entry) if eps_entry is not None else float(eps_obj.get("epsilon_emp", 0.0))
 
-    # t_margin per-bit
+    # t_margin: quantiles hold dict with {per_bit, scalar}
     tm_entry = _get_quantile_entry(tm_obj, quantile)
-    if isinstance(tm_entry, dict) and "per_bit" in tm_entry:
-        tm_vec = [float(x) for x in tm_entry["per_bit"]]
+    if isinstance(tm_entry, dict) and "scalar" in tm_entry:
+        tm_scalar = float(tm_entry["scalar"])
     else:
-        scalar = float(tm_obj.get("scalar", 0.0))
-        tm_vec = [scalar, scalar, scalar, scalar]
+        tm_scalar = float(tm_obj.get("scalar", 0.0))
 
-    return [e + t for e, t in zip(eps_vec, tm_vec)]
+    return eps + tm_scalar
 
 
 def compute_baseline(model_dir: str, anchor_code: str, secret_key: str = "XDF") -> Dict:
@@ -214,12 +223,21 @@ def compute_required_delta_per_anchor(
     batch_size_for_parallel: int = 20,
 ) -> Dict:
     """
-    针对单个 anchor 代码，按测试分布生成 K 个等价变体，
-    计算“有符号Δ”的正/负分布分位，用于双侧门槛构建（2维方案）。
+    针对单个 anchor，按测试分布生成 K_thr 等价候选，计算二维有符号Δ的分布分位，
+    返回旧字段（兼容贪心）与通用 thresholds.m_pos/m_neg 以及可选统计信息。
     """
-    # 生成候选（阈值估计固定采样 50 次，不随嵌入阶段 K 变化）
+    # 1) 生成候选（门槛由底层生成器负责），阈值估计固定用 50 个样本
     K_thr = 50
-    cands = build_candidates_test_like(anchor_code, max(1, K_thr), num_workers=num_workers, batch_size_for_parallel=batch_size_for_parallel)
+    try:
+        cands = build_candidates_test_like(
+            anchor_code,
+            max(1, K_thr),
+            num_workers=num_workers,
+            batch_size_for_parallel=batch_size_for_parallel,
+        )
+    except Exception:
+        cands = []
+
     # 过滤无变化
     cands = [c for c in cands if isinstance(c, str) and c.strip() and c.strip() != anchor_code.strip()]
     if not cands:
@@ -231,22 +249,29 @@ def compute_required_delta_per_anchor(
             "m_neg1": 0.0,
             "T_pos0": 0.0,
             "T_neg1": 0.0,
+            "thresholds": {"m_pos": [0.0, 0.0], "m_neg": [0.0, 0.0]},
+            "stats_optional": {
+                "quantile": float(quantile),
+                "q_pos": [0.0, 0.0],
+                "q_neg": [0.0, 0.0],
+                "T_pos": [0.0, 0.0],
+                "T_neg": [0.0, 0.0],
+            },
         }
 
-    # 编码并投影
+    # 2) 编码并投影
     model, tokenizer, device = load_encoder(model_dir, use_quantization=quantized)
-    anchors = [anchor_code]
-    v_anchor = embed_codes(model, tokenizer, anchors, max_length=max_length, batch_size=batch_size, device=device)
+    v_anchor = embed_codes(model, tokenizer, [anchor_code], max_length=max_length, batch_size=batch_size, device=device)
     v_cands = embed_codes(model, tokenizer, cands, max_length=max_length, batch_size=batch_size, device=device)
 
     d = v_anchor.shape[1]
-    W = derive_directions(secret_key=secret_key, d=d, k=2)
+    W = derive_directions(secret_key=secret_key, d=int(d), k=2)
     s_anchor = project_embeddings(v_anchor, W)[0]  # [2]
     s_cands = project_embeddings(v_cands, W)       # [K,2]
 
-    delta = s_cands - s_anchor[None, :]  # [K,2], 有符号
+    delta = s_cands - s_anchor[None, :]  # [K,2]
 
-    # 通用二维分布分位（每维的正向/负向分布）
+    # 3) 分布分位（每维的正向/负向组件）
     pos0 = np.maximum(+delta[:, 0], 0.0)
     neg0 = np.maximum(-delta[:, 0], 0.0)
     pos1 = np.maximum(+delta[:, 1], 0.0)
@@ -255,20 +280,15 @@ def compute_required_delta_per_anchor(
     q_pos = [float(np.quantile(pos0, quantile)), float(np.quantile(pos1, quantile))]
     q_neg = [float(np.quantile(neg0, quantile)), float(np.quantile(neg1, quantile))]
 
-    # 身份阈值（用于提取与判定）：m_pos[i] 用于判 1，m_neg[i] 用于判 0
+    # 身份阈值：用于提取与判定（每维）
     m_pos = [0.1 * q_pos[0], 0.1 * q_pos[1]]
     m_neg = [0.1 * q_neg[0], 0.1 * q_neg[1]]
 
-    # 可选目标阈（注入阶段可能使用的达标目标）
+    # 可选注入目标阈（每维）
     T_pos = [q_pos[0] + m_pos[0], q_pos[1] + m_pos[1]]
     T_neg = [q_neg[0] + m_neg[0], q_neg[1] + m_neg[1]]
 
-    # 兼容旧字段（当前贪心实现使用的口径）：
-    # 保留原有非对称定义：
-    #  - q_neg0: 第0维的负向分位（用于信息位推进的防守边界）
-    #  - q_pos1: 第1维的正向分位（用于非信息位抑制的防守边界）
-    #  - m_pos0 = 0.1*q_neg0, T_pos0 = q_neg0 + m_pos0
-    #  - m_neg1 = 0.1*q_pos1, T_neg1 = q_pos1 + m_neg1
+    # 兼容旧字段（现有贪心依赖的非对称口径）
     q_neg0_legacy = q_neg[0]
     q_pos1_legacy = q_pos[1]
     m_pos0_legacy = 0.1 * q_neg0_legacy
@@ -299,5 +319,4 @@ def compute_required_delta_per_anchor(
             "T_neg": [float(T_neg[0]), float(T_neg[1])],
         },
     }
-
 

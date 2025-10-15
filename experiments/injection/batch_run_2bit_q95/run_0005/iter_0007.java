@@ -12,34 +12,29 @@ public static double distance(LineSegment3D_F64 l, Point3D_F64 p) {
   double vy = l.b.y - l.a.y;
   double vz = l.b.z - l.a.z;
 
-  // Length of AB
-  double len = Math.sqrt(vx * vx + vy * vy + vz * vz);
+  // Squared length of AB
+  double l2 = vx * vx + vy * vy + vz * vz;
 
   // Degenerate segment check
-  if (len == 0.0) {
-    double adx = p.x - l.a.x;
-    double ady = p.y - l.a.y;
-    double adz = p.z - l.a.z;
-    return Math.sqrt(adx * adx + ady * ady + adz * adz);
+  if (l2 == 0.0) {
+    return Math.sqrt(ap2);
   }
 
   // Projection of AP onto AB, in units of AB length
-  double t = (vx * dx + vy * dy + vz * dz) / len;
+  double dot = dx * vx + dy * vy + dz * vz;
+  double s = dot / l2;
 
   // Check end points
-  if (t <= 0.0) {
-    double adx = p.x - l.a.x;
-    double ady = p.y - l.a.y;
-    double adz = p.z - l.a.z;
-    return Math.sqrt(adx * adx + ady * ady + adz * adz);
-  } else if (t >= len) {
+  if (s <= 0.0) {
+    return Math.sqrt(ap2);
+  } else if (s >= 1.0) {
     double bdx = p.x - l.b.x;
     double bdy = p.y - l.b.y;
     double bdz = p.z - l.b.z;
     return Math.sqrt(bdx * bdx + bdy * bdy + bdz * bdz);
   }
 
-  double distanceSq = ap2 - t * t;
+  double distanceSq = ap2 - (dot * dot) / l2;
 
   // round off error can make distanceSq go negative when it is very close to zero
   if (distanceSq < 0.0) {

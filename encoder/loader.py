@@ -28,8 +28,10 @@ def _ensure_sys_path_for_contrastive_learning() -> None:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     xdf_root = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
     srcmarker_root = os.path.join(xdf_root, "SrcMarker-main")
-    if srcmarker_root not in sys.path:
-        sys.path.append(srcmarker_root)
+    # 确保优先命中 XDF/SrcMarker-main 下的 contrastive_learning
+    if srcmarker_root in sys.path:
+        sys.path.remove(srcmarker_root)
+    sys.path.insert(0, srcmarker_root)
 
 _ensure_sys_path_for_contrastive_learning()
 

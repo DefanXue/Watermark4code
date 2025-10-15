@@ -1,35 +1,41 @@
-public static double handleDistance( obj_34 arg_59,
- tmp_24 var_17 ) {
+public static double distance(LineSegment3D_F64 l, Point3D_F64 p) {
+    // Vector from A to P
+    double dx = p.x - l.a.x;
+    double dy = p.y - l.a.y;
+    double dz = p.z - l.a.z;
 
-		double APx =  var_17.x -  arg_59.a.x; 
-		double APy = var_17.y - arg_59.a.y;
-		double APz = var_17.z - arg_59.a.z;
+    // Squared distance from A to P
+    double ap2 = dx*dx + dy*dy + dz*dz;
 
-  		double AP2 = APx*APx + APy*APy + APz*APz;
+    // Vector from A to B
+    double vx = l.b.x - l.a.x;
+    double vy = l.b.y - l.a.y;
+    double vz = l.b.z - l.a.z;
 
- double ABx = arg_59.b.x - arg_59.a.x;
- 		double ABy = arg_59.b.y - arg_59.a.y;
-		double ABz = arg_59.b.z - arg_59.a.z;
+    // Length of AB
+    double len = Math.sqrt(vx*vx + vy*vy + vz*vz);
 
- double AB2 = ABx*ABx + ABy*ABy + ABz*ABz;
-		double ABlen = Math.sqrt(AB2);
+    // Degenerate segment check
+    if (len == 0.0) {
+        return p.distance(l.a);
+    }
 
- double t = (ABx*APx + ABy*APy + ABz*APz) / ABlen; // Initialize variables
+    // Projection of AP onto AB, in units of AB length
+    double t = (vx*dx + vy*dy + vz*dz) / len;
 
-		// tmp_87 param_31 param_67
-		if( t <= 0 )
- return var_17.handleDistance(arg_59.a);
-		else if( t > =  ABlen )
- 			return var_17.handleDistance(arg_59.b);
+    // Check end points
+    if (t <= 0.0) {
+        return p.distance(l.a);
+    } else if (t >= len) {
+        return p.distance(l.b);
+    }
 
-		double distSq =  AP2 -  t* t; 
+    double distanceSq = ap2 - t*t;
 
- 		// tmp_61 var_99 arg_93 param_60 tmp_43 arg_52 item_40 val_30 obj_6 arg_70 item_49 item_16 arg_91 obj_47 val_31
-		if( distSq <  0 )
-{
- return 0;
-  } else
-{
- return Math.sqrt(distSq);
-		}
-	}
+    // round off error can make distanceSq go negative when it is very close to zero
+    if (distanceSq < 0.0) {
+        return 0.0;
+    } else {
+        return Math.sqrt(distanceSq);
+    }
+}

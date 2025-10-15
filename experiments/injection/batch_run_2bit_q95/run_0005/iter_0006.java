@@ -12,15 +12,13 @@ public static double distance(LineSegment3D_F64 l, Point3D_F64 p) {
   double vy = l.b.y - l.a.y;
   double vz = l.b.z - l.a.z;
 
-  // Length of AB
-  double len = Math.sqrt(vx * vx + vy * vy + vz * vz);
+  // Length squared of AB
+  double l2 = vx * vx + vy * vy + vz * vz;
+  double len = Math.sqrt(l2);
 
   // Degenerate segment check
-  if (len == 0.0) {
-    double adx = p.x - l.a.x;
-    double ady = p.y - l.a.y;
-    double adz = p.z - l.a.z;
-    return Math.sqrt(adx * adx + ady * ady + adz * adz);
+  if (l2 == 0.0) {
+    return Math.sqrt(ap2);
   }
 
   // Projection of AP onto AB, in units of AB length
@@ -28,10 +26,7 @@ public static double distance(LineSegment3D_F64 l, Point3D_F64 p) {
 
   // Check end points
   if (t <= 0.0) {
-    double adx = p.x - l.a.x;
-    double ady = p.y - l.a.y;
-    double adz = p.z - l.a.z;
-    return Math.sqrt(adx * adx + ady * ady + adz * adz);
+    return Math.sqrt(ap2);
   } else if (t >= len) {
     double bdx = p.x - l.b.x;
     double bdy = p.y - l.b.y;
