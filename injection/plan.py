@@ -249,6 +249,7 @@ def build_candidates_by_type(
 def compute_required_delta_per_anchor(
     model_dir: str,
     anchor_code: str,
+    bits: List[int],
     secret_key: str = "XDF",
     K: int = 50,
     quantile: float = 0.90,
@@ -278,24 +279,17 @@ def compute_required_delta_per_anchor(
     # 过滤无变化
     cands = [c for c in cands if isinstance(c, str) and c.strip() and c.strip() != anchor_code.strip()]
     if not cands:
-        return {
-            "k": 2,
-            "q_neg0": 0.0,
-            "q_pos1": 0.0,
-            "m_pos0": 0.0,
-            "m_neg1": 0.0,
-            "T_pos0": 0.0,
-            "T_neg1": 0.0,
-            "thresholds": {"m_pos": [0.0, 0.0], "m_neg": [0.0, 0.0]},
-            "stats_optional": {
-                "quantile": float(quantile),
-                "q_pos": [0.0, 0.0],
-                "q_neg": [0.0, 0.0],
-                "T_pos": [0.0, 0.0],
-                "T_neg": [0.0, 0.0],
-            },
-            "review_stats": review_stats,
-        }
+        result = {"k": 4, "review_stats": review_stats}
+        for i in range(4):
+            if bits[i] == 1:
+                result[f"q_neg{i}"] = 0.0
+                result[f"m_pos{i}"] = 0.0
+                result[f"T_pos{i}"] = 0.0
+            else:
+                result[f"q_pos{i}"] = 0.0
+                result[f"m_neg{i}"] = 0.0
+                result[f"T_neg{i}"] = 0.0
+        return result
 
     # 2) 编码并投影
     model, tokenizer, device = load_encoder(model_dir, use_quantization=quantized)
@@ -303,60 +297,35 @@ def compute_required_delta_per_anchor(
     v_cands = embed_codes(model, tokenizer, cands, max_length=max_length, batch_size=batch_size, device=device)
 
     d = v_anchor.shape[1]
-    W = derive_directions(secret_key=secret_key, d=int(d), k=2)
-    s_anchor = project_embeddings(v_anchor, W)[0]  # [2]
-    s_cands = project_embeddings(v_cands, W)       # [K,2]
+    W = derive_directions(secret_key=secret_key, d=int(d), k=4)
+    s_anchor = project_embeddings(v_anchor, W)[0]  # [4]
+    s_cands = project_embeddings(v_cands, W)       # [K,4]
 
-    delta = s_cands - s_anchor[None, :]  # [K,2]
+    delta = s_cands - s_anchor[None, :]  # [K,4]
 
-    # 3) 分布分位（每维的正向/负向组件）
-    pos0 = np.maximum(+delta[:, 0], 0.0)
-    neg0 = np.maximum(-delta[:, 0], 0.0)
-    pos1 = np.maximum(+delta[:, 1], 0.0)
-    neg1 = np.maximum(-delta[:, 1], 0.0)
+    # 3) 分布分位（每维的正向/负向组件，根据bits值动态决定）
+    result = {"k": 4, "review_stats": review_stats}
+    
+    for i in range(4):
+        pos_i = np.maximum(+delta[:, i], 0.0)
+        neg_i = np.maximum(-delta[:, i], 0.0)
+        
+        if bits[i] == 1:
+            # bit=1: 需要推正，计算负向分位和正向阈值
+            q_neg_i = float(np.quantile(neg_i, quantile))
+            m_pos_i = 0.1 * q_neg_i
+            T_pos_i = q_neg_i + m_pos_i
+            result[f"q_neg{i}"] = q_neg_i
+            result[f"m_pos{i}"] = m_pos_i
+            result[f"T_pos{i}"] = T_pos_i
+        else:  # bits[i] == 0
+            # bit=0: 需要拉负，计算正向分位和负向阈值
+            q_pos_i = float(np.quantile(pos_i, quantile))
+            m_neg_i = 0.1 * q_pos_i
+            T_neg_i = q_pos_i + m_neg_i
+            result[f"q_pos{i}"] = q_pos_i
+            result[f"m_neg{i}"] = m_neg_i
+            result[f"T_neg{i}"] = T_neg_i
 
-    q_pos = [float(np.quantile(pos0, quantile)), float(np.quantile(pos1, quantile))]
-    q_neg = [float(np.quantile(neg0, quantile)), float(np.quantile(neg1, quantile))]
-
-    # 身份阈值：用于提取与判定（每维）
-    m_pos = [0.1 * q_pos[0], 0.1 * q_pos[1]]
-    m_neg = [0.1 * q_neg[0], 0.1 * q_neg[1]]
-
-    # 可选注入目标阈（每维）
-    T_pos = [q_pos[0] + m_pos[0], q_pos[1] + m_pos[1]]
-    T_neg = [q_neg[0] + m_neg[0], q_neg[1] + m_neg[1]]
-
-    # 兼容旧字段（现有贪心依赖的非对称口径）
-    q_neg0_legacy = q_neg[0]
-    q_pos1_legacy = q_pos[1]
-    m_pos0_legacy = 0.1 * q_neg0_legacy
-    m_neg1_legacy = 0.1 * q_pos1_legacy
-    T_pos0_legacy = q_neg0_legacy + m_pos0_legacy
-    T_neg1_legacy = q_pos1_legacy + m_neg1_legacy
-
-    return {
-        "k": 2,
-        # 旧字段（供现有注入贪心使用）
-        "q_neg0": float(q_neg0_legacy),
-        "q_pos1": float(q_pos1_legacy),
-        "m_pos0": float(m_pos0_legacy),
-        "m_neg1": float(m_neg1_legacy),
-        "T_pos0": float(T_pos0_legacy),
-        "T_neg1": float(T_neg1_legacy),
-        # 新阈值结构（供提取/通用判定使用）
-        "thresholds": {
-            "m_pos": [float(m_pos[0]), float(m_pos[1])],
-            "m_neg": [float(m_neg[0]), float(m_neg[1])],
-        },
-        # 可选统计（审计用，不影响判定）
-        "stats_optional": {
-            "quantile": float(quantile),
-            "q_pos": [float(q_pos[0]), float(q_pos[1])],
-            "q_neg": [float(q_neg[0]), float(q_neg[1])],
-            "T_pos": [float(T_pos[0]), float(T_pos[1])],
-            "T_neg": [float(T_neg[0]), float(T_neg[1])],
-        },
-        # 变体审核统计
-        "review_stats": review_stats,
-    }
+    return result
 
