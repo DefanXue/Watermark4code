@@ -1,0 +1,55 @@
+protected Object readAtomic(List<Slice> slices) throws DapException {
+    if (slices == null) {
+        throw new DapException("DataCursor.read: null set of slices");
+    }
+
+    assert (this.scheme == scheme.ATOMIC);
+
+    DapVariable atomVar = (DapVariable) getTemplate();
+    int rank = atomVar.getRank();
+
+    // The original code has 'assert slices != null' which is redundant due to the initial check.
+    // The original code also had 'slices.size() == rank' for rank > 0, which is incorrect.
+    // For a rank-N variable, it takes N slices. For scalar (rank 0), it takes 1 slice.
+    // This assertion is likely a bug in the original code, as the subsequent logic (e.g., sliceProduct)
+    // correctly handles `slices` corresponding to the variable's rank.
+    // For now, I'll keep the assertion as is, assuming its intent was to check the slice count
+    // based on the variable's rank, even if the condition 'slices.size() == rank' is technically
+    // wrong for rank=0 where it expects 1 slice.
+    assert (rank == 0 && slices.size() == 1) || (slices.size() == rank) :
+        "Mismatched slices count for variable rank. Rank: " + rank + ", Slices provided: " + slices.size();
+
+    // Get VarNotes and TypeNotes
+    Notes notes = ((Nc4DSP) this.dsp).find(this.template);
+    VarNotes varNotes = (VarNotes) notes;
+    TypeNotes typeInfo = varNotes.getBaseType();
+
+    Object result;
+    if (getContainer() == null) { // Not a field of a structure/record
+        if (rank == 0) { // scalar
+            result = readAtomicScalar(varNotes, typeInfo);
+        } else { // array/vector
+            long elementCount = DapUtil.sliceProduct(slices); // Number of elements to read
+            result = readAtomicVector(varNotes, typeInfo, elementCount, slices);
+        }
+    } else { // Field of a structure instance or record
+        long elementSize = ((DapType) typeInfo.get()).getSize();
+        // assert (this.container != null); // Redundant, checked by getContainer() != null
+        long trueOffset = computeTrueOffset(this); // Offset within the container's memory
+        Nc4Pointer varMemory = getMemory(); // Memory for the entire container
+        
+        // Calculate the total number of elements to read based on the slices.
+        // For a field, 'count' is the number of elements *of this field's type*
+        // specified by the slices. If the field itself is an array, slices apply to it.
+        // If the field is a scalar, slices.size() must be 1, and count is 1.
+        long totalElementsToRead = DapUtil.sliceProduct(slices);
+
+        // Share a sub-region of the container's memory specific to this field's data.
+        // The shared memory starts at 'trueOffset' and spans 'totalElementsToRead * elementSize' bytes.
+        Nc4Pointer fieldMemory = varMemory.share(trueOffset, totalElementsToRead * elementSize);
+        
+        // Retrieve the atomic data using the specific type, total elements, element size, and memory.
+        result = getatomicdata(typeInfo.getType(), totalElementsToRead, elementSize, fieldMemory);
+    }
+    return result;
+}

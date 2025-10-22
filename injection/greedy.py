@@ -53,7 +53,7 @@ def select_and_inject(
         # 为三类变体各生成 K 个候选，合并为一个列表（三类并发触发）
         all_cands = []
         all_types = []
-        aug_types = ("semantic_preserving", "retranslate", "llm_rewrite")
+        aug_types = ("semantic_preserving", "llm_rewrite")
         with ThreadPoolExecutor(max_workers=len(aug_types)) as ex:
             futs = {
                 ex.submit(

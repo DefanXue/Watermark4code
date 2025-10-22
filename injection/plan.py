@@ -98,33 +98,46 @@ def build_candidates_test_like(
     K: int,
     num_workers: int = 48,
     batch_size_for_parallel: int = 20,
-) -> List[str]:
+) -> Tuple[List[str], Dict]:
     """
     Match test-split generation: split_type='test', positive_ratio=1.0, proportions 0.2/0.5/0.3.
     To get K variants, duplicate the same anchor K times as input.
+    
+    Returns:
+        (cands, stats): 
+            cands - 通过审核的变体列表
+            stats - {"passed_count": int, "failed_reasons": {"原因1": 计数, ...}}
     """
     aug_types = {
-        "semantic_preserving": 0.2,
-        "llm_rewrite": 0.5,
-        "retranslate": 0.3,
+        "semantic_preserving": 0.7,  # 提高到 70% 以降低 token 消耗
+        "llm_rewrite": 0.3,           # 降低到 30%
+        "retranslate": 0.0,
     }
 
     in_file = _write_anchor_copies_tmp(anchor_code, K)
     out_dir = tempfile.mkdtemp(prefix="wm_aug_")
     out_file = os.path.join(out_dir, "augmented.jsonl")
+    review_stats_file = os.path.join(out_dir, "review_stats.jsonl")
 
-    generate_java_training_data_parallel(
-        input_file=in_file,
-        output_file=out_file,
-        model={"name": os.environ.get("NEWAPI_MODEL", "gpt-5-mini")},
-        split_type="test",
-        positive_ratio=1.0,
-        augmentation_types=aug_types,
-        max_samples=K,
-        num_workers=num_workers,
-        batch_size=batch_size_for_parallel,
-        resume=False,
-    )
+    # 通过环境变量传递统计文件路径
+    os.environ['REVIEW_STATS_FILE'] = review_stats_file
+    
+    try:
+        generate_java_training_data_parallel(
+            input_file=in_file,
+            output_file=out_file,
+            model={"name": os.environ.get("NEWAPI_MODEL", "gpt-5-mini")},
+            split_type="test",
+            positive_ratio=1.0,
+            augmentation_types=aug_types,
+            max_samples=K,
+            num_workers=num_workers,
+            batch_size=batch_size_for_parallel,
+            resume=False,
+        )
+    finally:
+        if 'REVIEW_STATS_FILE' in os.environ:
+            del os.environ['REVIEW_STATS_FILE']
 
     cands: List[str] = []
     with open(out_file, "r", encoding="utf-8") as f:
@@ -140,6 +153,29 @@ def build_candidates_test_like(
                 if cand and cand != anchor_code.strip():
                     cands.append(cand)
 
+    # 读取审核统计
+    passed_count = 0
+    failed_reasons = {}
+    if os.path.exists(review_stats_file):
+        with open(review_stats_file, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    record = json.loads(line)
+                    if record.get("passed"):
+                        passed_count += 1
+                    else:
+                        reason = record.get("reason", "未知原因")
+                        failed_reasons[reason] = failed_reasons.get(reason, 0) + 1
+                except Exception:
+                    continue
+    
+    stats = {
+        "passed_count": passed_count,
+        "failed_reasons": failed_reasons
+    }
+
     # 去重并截取 K
     uniq: List[str] = []
     seen = set()
@@ -149,7 +185,7 @@ def build_candidates_test_like(
             seen.add(c)
         if len(uniq) >= K:
             break
-    return uniq
+    return uniq, stats
 
 
 def build_candidates_by_type(
@@ -229,7 +265,7 @@ def compute_required_delta_per_anchor(
     # 1) 生成候选（门槛由底层生成器负责），阈值估计固定用 50 个样本
     K_thr = 50
     try:
-        cands = build_candidates_test_like(
+        cands, review_stats = build_candidates_test_like(
             anchor_code,
             max(1, K_thr),
             num_workers=num_workers,
@@ -237,6 +273,7 @@ def compute_required_delta_per_anchor(
         )
     except Exception:
         cands = []
+        review_stats = {"passed_count": 0, "failed_reasons": {}}
 
     # 过滤无变化
     cands = [c for c in cands if isinstance(c, str) and c.strip() and c.strip() != anchor_code.strip()]
@@ -257,6 +294,7 @@ def compute_required_delta_per_anchor(
                 "T_pos": [0.0, 0.0],
                 "T_neg": [0.0, 0.0],
             },
+            "review_stats": review_stats,
         }
 
     # 2) 编码并投影
@@ -318,5 +356,7 @@ def compute_required_delta_per_anchor(
             "T_pos": [float(T_pos[0]), float(T_pos[1])],
             "T_neg": [float(T_neg[0]), float(T_neg[1])],
         },
+        # 变体审核统计
+        "review_stats": review_stats,
     }
 
