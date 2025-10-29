@@ -36,4 +36,4 @@ python tools/generate_phi_java.py \
 
 注意：
 - 仅生成候选并做静态预检，不做真实注入、不改动源文件（注入与精排将在后续步骤执行）
-- 敏感词黑名单当前为空（`tools/sensitive_words.json`），未来可按需扩充 
+- 敏感词黑名单当前为空（`tools/sensitive_words.json`），未来可按需扩充

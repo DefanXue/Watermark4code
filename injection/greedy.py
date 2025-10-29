@@ -20,7 +20,7 @@ def select_and_inject(
     bits: List[int],
     required_delta,
     secret_key: str = "XDF",
-    K: int = 50,
+    K: int = 100,
     max_iters: int = 8,
     num_workers: int = 48,
     batch_size_for_parallel: int = 20,
@@ -32,38 +32,44 @@ def select_and_inject(
     """
     model, tokenizer, device = load_encoder(model_dir, use_quantization=True)
 
+    # 使用簇中心作为baseline
+    s0 = np.array(required_delta["s0"], dtype=np.float32)  # 簇中心
+    
+    # 计算原始代码的投影和W矩阵
     baseline = compute_baseline(model_dir, anchor_code, secret_key=secret_key)
-    s0 = baseline["s0"].astype(np.float32)
+    s_original = baseline["s0"].astype(np.float32)
     W = baseline["W"].astype(np.float32)
 
-    # 2维方案：信息位=第0维（推正），非信息位=第1维（拉负）
-    # required_delta 现在是 dict，包含 q_neg0/q_pos1 及 T/m
-    q_neg0 = float(required_delta.get("q_neg0", 0.0))
-    q_pos1 = float(required_delta.get("q_pos1", 0.0))
-    m_pos0 = float(required_delta.get("m_pos0", 0.0))
-    m_neg1 = float(required_delta.get("m_neg1", 0.0))
-    T_pos0 = float(required_delta.get("T_pos0", q_neg0 + m_pos0))
-    T_neg1 = float(required_delta.get("T_neg1", q_pos1 + m_neg1))
+    # 逐位方案：读取4个维度的独立阈值
+    bitwise_thresholds = required_delta.get("bitwise_thresholds", {})
+    
+    if not bitwise_thresholds:
+        raise ValueError("bitwise_thresholds not found in required_delta")
 
     trace: List[Dict] = []
     current_code = anchor_code
-    current_s0 = s0.copy()
+    current_s = s_original.copy()  # 当前代码的投影
 
     for it in range(max_iters):
-        # 为三类变体各生成 K 个候选，合并为一个列表（三类并发触发）
+        # 为不同类型生成不同数量的候选：
+        # semantic_preserving: 3*K 个（静态规则，成本低）
+        # llm_rewrite: K 个（LLM重写，成本高）
         all_cands = []
         all_types = []
-        aug_types = ("semantic_preserving", "llm_rewrite")
-        with ThreadPoolExecutor(max_workers=len(aug_types)) as ex:
+        aug_configs = [
+            ("semantic_preserving", 10 * K),  # 静态规则：3倍候选
+            ("llm_rewrite", 0 * K),               # LLM重写：保持原K
+        ]
+        with ThreadPoolExecutor(max_workers=len(aug_configs)) as ex:
             futs = {
                 ex.submit(
                     build_candidates_by_type,
                     current_code,
-                    K,
+                    k_count,
                     aug_type,
                     num_workers,
                     batch_size_for_parallel,
-                ): aug_type for aug_type in aug_types
+                ): aug_type for aug_type, k_count in aug_configs
             }
             for fut in as_completed(futs):
                 aug_type = futs[fut]
@@ -81,34 +87,112 @@ def select_and_inject(
             break  # 无候选，停止迭代
 
         # 统一计算所有候选的增益
-        g = measure_gains(model, tokenizer, W, current_s0, all_cands, device=device)
+        g = measure_gains(model, tokenizer, W, current_s, all_cands, device=device)
 
-        # 双侧打分：第0维奖励正向推进至 T_pos0；第1维奖励负向推进至 T_neg1；
-        # 惩罚：第0维负向回退、第1维正向外溢。
-        penalty_pos_overflow = 0.2
-        penalty_neg_back = 0.2
-        p = 1.5
-
-        delta_now = current_s0 - s0  # [2]
-        # 剩余缺口（信息位正向、非信息位负向）
-        rem_pos0 = max(T_pos0 - float(delta_now[0]), 0.0)
-        rem_neg1 = max(T_neg1 - float(-delta_now[1]), 0.0)
-
-        # 自适应权重（按缺口大小）
-        rem_vec = np.array([rem_pos0, rem_neg1], dtype=np.float32)
-        rem_pow = np.power(rem_vec, p)
-        denom = rem_pow.sum() + 1e-8
-        alpha = rem_pow / denom  # [2]
-
-        # 奖励项
-        gain_pos0 = np.minimum(np.clip(g[:, 0], 0.0, None), rem_pos0) * alpha[0]
-        gain_neg1 = np.minimum(np.clip(-g[:, 1], 0.0, None), rem_neg1) * alpha[1]
-        reward = gain_pos0 + gain_neg1
-
-        # 惩罚项
-        punish_back0 = np.clip(-g[:, 0], 0.0, None) * penalty_neg_back
-        punish_over1 = np.clip(g[:, 1], 0.0, None) * penalty_pos_overflow
-        scores = reward - (punish_back0 + punish_over1)
+        # 逐位打分：计算当前状态和剩余距离（相对于簇中心）
+        offset_now = current_s - s0  # [4]，相对于簇中心的偏移
+        
+        # 计算每个维度的归一化剩余距离
+        normalized_remainders = []
+        for i in range(4):
+            m_pos = bitwise_thresholds[i]["m_pos"]
+            m_neg = bitwise_thresholds[i]["m_neg"]
+            
+            if bits[i] == 1:
+                # bit=1：目标 offset ≥ m_pos
+                remainder = max(m_pos - offset_now[i], 0.0)
+                norm_remainder = remainder / (m_pos + 1e-8)
+            else:
+                # bit=0：目标 offset ≤ -m_neg
+                remainder = max(offset_now[i] + m_neg, 0.0)
+                norm_remainder = remainder / (m_neg + 1e-8)
+            
+            normalized_remainders.append(norm_remainder)
+        
+        total_normalized_remainder = sum(normalized_remainders) + 1e-8
+        
+        # 对每个候选打分
+        scores = np.zeros(len(all_cands), dtype=np.float32)
+        
+        for cand_idx in range(len(all_cands)):
+            gain = g[cand_idx]  # [4]
+            score = 0.0
+            
+            # 逐维打分
+            for i in range(4):
+                m_pos = bitwise_thresholds[i]["m_pos"]
+                m_neg = bitwise_thresholds[i]["m_neg"]
+                
+                # 权重：归一化剩余距离占比（距离越远权重越大）
+                weight = normalized_remainders[i] / total_normalized_remainder
+                
+                if bits[i] == 1:
+                    # 目标：推正（offset >= m_pos）
+                    offset_after = offset_now[i] + gain[i]
+                    
+                    if offset_now[i] >= m_pos:
+                        # 情况1：当前已达标
+                        if gain[i] < 0:
+                            # 倒退
+                            if offset_after >= m_pos:
+                                # 还在安全区，不惩罚
+                                score += 0.0
+                            else:
+                                # 倒退到阈值以下，惩罚
+                                remainder_after = m_pos - offset_after
+                                norm_remainder_after = remainder_after / (m_pos + 1e-8)
+                                temp_total = total_normalized_remainder + norm_remainder_after
+                                temp_weight = norm_remainder_after / (temp_total + 1e-8)
+                                score -= norm_remainder_after * temp_weight * 6.0
+                        else:
+                            # 继续推进，小奖励
+                            norm_gain = gain[i] / (m_pos + 1e-8)
+                            score += norm_gain * 0.1
+                    else:
+                        # 情况2：当前未达标
+                        if gain[i] > 0:
+                            # 正向推进，根据权重奖励
+                            norm_progress = min(gain[i] / (m_pos + 1e-8), normalized_remainders[i])
+                            score += norm_progress * weight * 6.0
+                        else:
+                            # 反向倒退，对称惩罚
+                            norm_backtrack = abs(gain[i]) / (m_pos + 1e-8)
+                            score -= norm_backtrack * weight * 6.0
+                
+                else:
+                    # 目标：推负（offset <= -m_neg）
+                    offset_after = offset_now[i] + gain[i]
+                    
+                    if offset_now[i] <= -m_neg:
+                        # 情况1：当前已达标
+                        if gain[i] > 0:
+                            # 倒退（正向）
+                            if offset_after <= -m_neg:
+                                # 还在安全区，不惩罚
+                                score += 0.0
+                            else:
+                                # 倒退到阈值以下，惩罚
+                                remainder_after = offset_after - (-m_neg)
+                                norm_remainder_after = remainder_after / (m_neg + 1e-8)
+                                temp_total = total_normalized_remainder + norm_remainder_after
+                                temp_weight = norm_remainder_after / (temp_total + 1e-8)
+                                score -= norm_remainder_after * temp_weight * 6.0
+                        else:
+                            # 继续推进，小奖励
+                            norm_gain = abs(gain[i]) / (m_neg + 1e-8)
+                            score += norm_gain * 0.1
+                    else:
+                        # 情况2：当前未达标
+                        if gain[i] < 0:
+                            # 正向推进，根据权重奖励
+                            norm_progress = min(abs(gain[i]) / (m_neg + 1e-8), normalized_remainders[i])
+                            score += norm_progress * weight * 6.0
+                        else:
+                            # 反向倒退，对称惩罚
+                            norm_backtrack = gain[i] / (m_neg + 1e-8)
+                            score -= norm_backtrack * weight * 6.0
+            
+            scores[cand_idx] = score
 
         try:
             trace.append({
@@ -149,25 +233,34 @@ def select_and_inject(
                 pass
         current_code = best_code
         base2 = compute_baseline(model_dir, current_code, secret_key=secret_key)
-        current_s0 = base2["s0"].astype(np.float32)
+        current_s = base2["s0"].astype(np.float32)
 
-        # 达标检查（双侧）：Δ0≥T_pos0 且 Δ1≤−T_neg1
-        delta_now = current_s0 - s0
-        if (float(delta_now[0]) >= T_pos0) and (float(delta_now[1]) <= -T_neg1):
+        # 达标检查（逐位方案）：相对于簇中心的offset
+        offset_now = current_s - s0
+        all_satisfied = True
+        
+        for i in range(4):
+            m_pos = bitwise_thresholds[i]["m_pos"]
+            m_neg = bitwise_thresholds[i]["m_neg"]
+            
+            if bits[i] == 1:
+                if offset_now[i] < m_pos:
+                    all_satisfied = False
+                    break
+            else:
+                if offset_now[i] > -m_neg:
+                    all_satisfied = False
+                    break
+        
+        if all_satisfied:
             break
 
-    s_after = current_s0
+    s_after = current_s
     return {
         "final_code": current_code,
-        "s0": s0.tolist(),
-        "s_after": s_after.tolist(),
+        "s0": s0.tolist(),  # 簇中心
+        "s_after": s_after.tolist(),  # 最终代码投影
         "trace": trace,
-        "q_neg0": q_neg0,
-        "q_pos1": q_pos1,
-        "m_pos0": m_pos0,
-        "m_neg1": m_neg1,
-        "T_pos0": T_pos0,
-        "T_neg1": T_neg1,
     }
 
 

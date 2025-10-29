@@ -30,7 +30,7 @@ except Exception:
 
 DEFAULT_SECRET = "XDF"
 DEFAULT_D = 768
-DEFAULT_K = 2
+DEFAULT_K = 4
 DEFAULT_T_MARGIN = 0.10
 
 

@@ -1,0 +1,86 @@
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary experiment outputs (可根据需要调整)
+# 注意：我们不忽略 experiments/ 文件夹中的 .py 源代码
+# 只忽略实验数据输出目录
+experiments/injection/batch_run_*/
+experiments/Attack/Rename_Attack/results/
+
+# Model checkpoints (保留 best_model，但忽略训练中间产物)
+# 根据实际情况调整
+# *.pt
+# *.pth
+# *.ckpt
+
+# Large data files (如需跟踪大文件，使用 git-lfs)
+# *.h5
+# *.pkl
+# *.npy
+

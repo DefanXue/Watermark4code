@@ -45,6 +45,7 @@ def process_one_anchor(task):
         required_delta = compute_required_delta_per_anchor(
             model_dir=args_dict["model_dir"],
             anchor_code=code,
+            bits=args_dict["bits"],
             secret_key=args_dict["secret"],
             K=args_dict["K"],
             quantile=args_dict["quantile"],
@@ -68,20 +69,50 @@ def process_one_anchor(task):
 
         # 写结果文件
         save_text(os.path.join(run_dir, 'final.java'), res['final_code'])
+        if "median_code" in required_delta and required_delta["median_code"]:
+            save_text(os.path.join(run_dir, 'median.java'), required_delta["median_code"])
+        if "median_code_balanced" in required_delta and required_delta["median_code_balanced"]:
+            save_text(os.path.join(run_dir, 'median_balanced.java'), required_delta["median_code_balanced"])
         save_json(os.path.join(run_dir, 'final.json'), {
             'bits': args_dict["bits_str"],
-            'required_delta_vec': required_delta,
-            **{k: v for k, v in res.items() if k != 'final_code'}
+            # 方法1：中位数中心
+            's0': required_delta["s0"],
+            'median_code': required_delta.get("median_code", ""),
+            'cluster_info': required_delta.get("cluster_info", {}),
+            'bitwise_thresholds': required_delta.get("bitwise_thresholds", {}),
+            # 方法2：平衡中心
+            's0_balanced': required_delta.get("s0_balanced", []),
+            'median_code_balanced': required_delta.get("median_code_balanced", ""),
+            'cluster_info_balanced': required_delta.get("cluster_info_balanced", {}),
+            'bitwise_thresholds_balanced': required_delta.get("bitwise_thresholds_balanced", {}),
+            's_after': res['s_after'],
+            'trace': res.get('trace', [])
         })
 
-        # 判定是否达标（2维方案：信息位第0维推正、非信息位第1维拉负；验证口径只看身份阈值）
-        s0 = res['s0']
-        sa = res['s_after']
-        delta = [a - b for a, b in zip(sa, s0)]
-        m_pos0 = float(required_delta.get("m_pos0", 0.0))
-        m_neg1 = float(required_delta.get("m_neg1", 0.0))
-        ok = (delta[0] >= m_pos0) and (delta[1] <= -m_neg1)
-        return {"idx": idx, "ok": ok, "delta": delta, "error": None}
+        # 判定是否达标（逐位方案）：相对于簇中心
+        s0_center = required_delta["s0"]  # 簇中心
+        s_after = res['s_after']
+        offset = [s_after[i] - s0_center[i] for i in range(4)]  # 相对于簇中心的偏移
+        
+        # 读取逐位阈值
+        bitwise_thresholds = required_delta.get("bitwise_thresholds", {})
+        bits = args_dict["bits"]
+        
+        # 逐维判断
+        ok = True
+        for i in range(4):
+            if bits[i] == 1:
+                m_pos_i = bitwise_thresholds[i]["m_pos"]
+                if offset[i] < m_pos_i:
+                    ok = False
+                    break
+            else:
+                m_neg_i = bitwise_thresholds[i]["m_neg"]
+                if offset[i] > -m_neg_i:
+                    ok = False
+                    break
+        
+        return {"idx": idx, "ok": ok, "offset": offset, "error": None}
     except Exception as e:
         return {"idx": idx, "ok": False, "delta": None, "error": str(e)}
 

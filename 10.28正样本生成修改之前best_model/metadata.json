@@ -1,0 +1,8 @@
+{
+  "epoch": 4,
+  "global_step": 3985,
+  "best_val_loss": 0.47547767232907445,
+  "lambda": 0.0,
+  "model_type": "RobustEncoder",
+  "loss_type": "CombinedContrastiveLoss"
+}

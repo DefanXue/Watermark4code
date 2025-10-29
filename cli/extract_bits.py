@@ -14,23 +14,13 @@ def _read_text(path: str) -> str:
         return f.read()
 
 
-def _read_thresholds_from_final_json(final_json_path: str) -> Tuple[List[float], List[float]]:
+def _load_bitwise_thresholds(final_json_path: str) -> Dict:
     with open(final_json_path, "r", encoding="utf-8") as f:
         obj = json.load(f)
-    # 1) 优先读取 required_delta_vec.thresholds.m_pos/m_neg（数组，长度为2）
-    if isinstance(obj.get("required_delta_vec"), dict) and isinstance(obj["required_delta_vec"].get("thresholds"), dict):
-        mp = obj["required_delta_vec"]["thresholds"].get("m_pos")
-        mn = obj["required_delta_vec"]["thresholds"].get("m_neg")
-        if isinstance(mp, list) and isinstance(mn, list) and len(mp) == 2 and len(mn) == 2:
-            return [float(mp[0]), float(mp[1])], [float(mn[0]), float(mn[1])]
-    # 2) 其次读取顶层 thresholds.m_pos/m_neg（数组，长度为2）
-    if isinstance(obj.get("thresholds"), dict):
-        mp = obj["thresholds"].get("m_pos")
-        mn = obj["thresholds"].get("m_neg")
-        if isinstance(mp, list) and isinstance(mn, list) and len(mp) == 2 and len(mn) == 2:
-            return [float(mp[0]), float(mp[1])], [float(mn[0]), float(mn[1])]
-    # 3) 否则报错（不再回退到旧键）
-    raise ValueError("final.json 缺少 required_delta_vec.thresholds 或顶层 thresholds 的 m_pos/m_neg 数组")
+    bitwise_thresholds = obj.get("bitwise_thresholds", {})
+    if not bitwise_thresholds:
+        raise ValueError("final.json 缺少 bitwise_thresholds 字段")
+    return bitwise_thresholds
 
 
 def _find_suspect_file(dir_path: str) -> Optional[str]:
@@ -52,11 +42,10 @@ def extract_bit_for_dir(
     batch_size: int = 2,
 ) -> Dict:
     """
-    仅进行水印“提取”：
-    - 从 final.json 读取身份阈值 m_pos0/m_neg1
-    - 使用 encoder-only 表示与私钥方向（k=2）计算 Δ = s_after - s0
-    - 提取规则：Δ0 >= m_pos0 -> '1'；否则若 Δ1 <= -m_neg1 -> '0'；否则 'U'
-    不读取 final.json 中任何水印内容（bits/s0/s_after）。
+    水印提取（基于簇中心）：
+    - 从 final.json 读取簇中心 s0
+    - 计算 offset = s_suspect - s0（簇中心）
+    - 逐维判决：offset > 0 → "1", offset < 0 → "0", else → "U"
     """
     original_path = os.path.join(dir_path, "original.java")
     final_json_path = os.path.join(dir_path, "final.json")
@@ -69,49 +58,52 @@ def extract_bit_for_dir(
             "suspect": suspect_path,
             "final_json": final_json_path,
         },
-        "thresholds": None,
-        "delta": None,
-        "bits": None,
+        "offset": None,
+        "bits": "UUUU",
+        "uncertain_count": 4,
         "error": None,
-        "note": "threshold_source=final.json (identity only)",
     }
 
     try:
-        if not os.path.isfile(original_path):
-            raise FileNotFoundError("original.java 缺失")
         if suspect_path is None:
             raise FileNotFoundError("suspect.java 缺失")
         if not os.path.isfile(final_json_path):
             raise FileNotFoundError("final.json 缺失")
 
-        m_pos_vec, m_neg_vec = _read_thresholds_from_final_json(final_json_path)
-        result["thresholds"] = {"m_pos": m_pos_vec, "m_neg": m_neg_vec}
+        # 读取簇中心
+        with open(final_json_path, "r", encoding="utf-8") as f:
+            final_json = json.load(f)
+        
+        cluster_center = final_json.get("s0", None)
+        if cluster_center is None:
+            raise ValueError("final.json 缺少 s0（簇中心）字段")
 
-        # 编码并计算投影
+        # 只编码suspect代码
         model, tokenizer, device = load_encoder(model_dir, use_quantization=True)
-        codes: List[str] = [_read_text(original_path), _read_text(suspect_path)]
-        embs = embed_codes(model, tokenizer, codes, max_length=max_length, batch_size=batch_size, device=device)
+        suspect_code = _read_text(suspect_path)
+        embs = embed_codes(model, tokenizer, [suspect_code], max_length=max_length, batch_size=batch_size, device=device)
 
         d = embs.shape[1]
-        W = derive_directions(secret_key=secret_key, d=d, k=2)
-        s = project_embeddings(embs, W)  # [2,2]
-        s0 = s[0]
-        s1 = s[1]
-        delta0 = float(s1[0] - s0[0])
-        delta1 = float(s1[1] - s0[1])
-        result["delta"] = [delta0, delta1]
+        W = derive_directions(secret_key=secret_key, d=d, k=4)
+        s_suspect = project_embeddings(embs, W)[0]  # [4]
+        
+        # 计算相对于簇中心的偏移
+        offset = [float(s_suspect[i] - cluster_center[i]) for i in range(4)]
+        result["offset"] = offset
 
-        # 提取位（二维独立口径）：逐维输出并拼接为2位
-        def _bit_from_delta(d: float, m_pos: float, m_neg: float) -> str:
-            if d >= m_pos:
-                return "1"
-            if d <= -m_neg:
-                return "0"
-            return "U"
-
-        bit0 = _bit_from_delta(delta0, m_pos_vec[0], m_neg_vec[0])
-        bit1 = _bit_from_delta(delta1, m_pos_vec[1], m_neg_vec[1])
-        result["bits"] = f"{bit0}{bit1}"
+        # 逐维判决（纯粹基于符号）
+        bits_result = []
+        for i in range(4):
+            if offset[i] > 0:
+                bits_result.append("1")
+            elif offset[i] < 0:
+                bits_result.append("0")
+            else:
+                bits_result.append("U")
+        
+        bits = "".join(bits_result)
+        result["bits"] = bits
+        result["uncertain_count"] = bits.count("U")
 
     except Exception as e:
         result["error"] = str(e)
@@ -139,7 +131,7 @@ def extract_bits_for_root(root_dir: str, model_dir: str, secret_key: str = "XDF"
     if not entries:
         return summary
 
-    # 预读阈值与代码文本，构造批处理列表
+    # 预读簇中心与代码文本，构造批处理列表
     batch_records: List[Dict] = []
     for sub in entries:
         original_path = os.path.join(sub, "original.java")
@@ -156,77 +148,77 @@ def extract_bits_for_root(root_dir: str, model_dir: str, secret_key: str = "XDF"
         }
 
         try:
-            if not os.path.isfile(original_path):
-                raise FileNotFoundError("original.java 缺失")
             if suspect_path is None:
                 raise FileNotFoundError("suspect.java 与 final.java 均缺失")
             if not os.path.isfile(final_json_path):
                 raise FileNotFoundError("final.json 缺失")
 
-            m_pos_vec, m_neg_vec = _read_thresholds_from_final_json(final_json_path)
-            code_orig = _read_text(original_path)
+            # 读取簇中心
+            with open(final_json_path, "r", encoding="utf-8") as f:
+                final_json = json.load(f)
+            cluster_center = final_json.get("s0", None)
+            if cluster_center is None:
+                raise ValueError("final.json 缺少 s0（簇中心）字段")
+            
             code_susp = _read_text(suspect_path)
 
             batch_records.append({
                 **base_rec,
-                "thresholds": {"m_pos": m_pos_vec, "m_neg": m_neg_vec},
-                "code_original": code_orig,
+                "cluster_center": cluster_center,
                 "code_suspect": code_susp,
             })
         except Exception as e:
             summary["items"].append({
                 **base_rec,
-                "thresholds": None,
-                "delta": None,
-        "bits": None,
+                "offset": None,
+                "bits": "UUUU",
+                "uncertain_count": 4,
                 "error": str(e),
-                "note": "threshold_source=final.json (identity only)",
             })
 
     if not batch_records:
         return summary
 
-    # 单次加载模型，批量嵌入
+    # 单次加载模型，批量嵌入（只编码suspect代码）
     model, tokenizer, device = load_encoder(model_dir, use_quantization=True)
 
-    # 拼接批次：[orig1, susp1, orig2, susp2, ...]
+    # 拼接批次：[susp1, susp2, ...]
     codes: List[str] = []
     for rec in batch_records:
-        codes.append(rec["code_original"])
         codes.append(rec["code_suspect"])
 
     embs = embed_codes(model, tokenizer, codes, max_length=max_length, batch_size=batch_size, device=device)
     d = embs.shape[1]
-    W = derive_directions(secret_key=secret_key, d=d, k=2)
-    s_all = project_embeddings(embs, W)  # [2*N, 2]
+    W = derive_directions(secret_key=secret_key, d=d, k=4)
+    s_all = project_embeddings(embs, W)  # [N, 4]
 
     # 还原逐目录结果
     for i, rec in enumerate(batch_records):
-        s0 = s_all[2 * i]
-        s1 = s_all[2 * i + 1]
-        delta0 = float(s1[0] - s0[0])
-        delta1 = float(s1[1] - s0[1])
-        m_pos_vec = rec["thresholds"]["m_pos"]
-        m_neg_vec = rec["thresholds"]["m_neg"]
-
-        def _bit_from_delta(d: float, m_pos: float, m_neg: float) -> str:
-            if d >= m_pos:
-                return "1"
-            if d <= -m_neg:
-                return "0"
-            return "U"
-        bit0 = _bit_from_delta(delta0, m_pos_vec[0], m_neg_vec[0])
-        bit1 = _bit_from_delta(delta1, m_pos_vec[1], m_neg_vec[1])
-        bits = f"{bit0}{bit1}"
-
+        s_suspect = s_all[i]
+        cluster_center = rec["cluster_center"]
+        
+        # 计算相对于簇中心的偏移
+        offset = [float(s_suspect[j] - cluster_center[j]) for j in range(4)]
+        
+        # 逐维判决（纯粹基于符号）
+        bits_result = []
+        for j in range(4):
+            if offset[j] > 0:
+                bits_result.append("1")
+            elif offset[j] < 0:
+                bits_result.append("0")
+            else:
+                bits_result.append("U")
+        
+        bits = "".join(bits_result)
+        
         summary["items"].append({
             "dir": rec["dir"],
             "files": rec["files"],
-            "thresholds": rec["thresholds"],
-            "delta": [delta0, delta1],
+            "offset": offset,
             "bits": bits,
+            "uncertain_count": bits.count("U"),
             "error": None,
-            "note": "threshold_source=final.json (identity only)",
         })
 
     return summary

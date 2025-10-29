@@ -109,8 +109,8 @@ def build_candidates_test_like(
             stats - {"passed_count": int, "failed_reasons": {"原因1": 计数, ...}}
     """
     aug_types = {
-        "semantic_preserving": 0.7,  # 提高到 70% 以降低 token 消耗
-        "llm_rewrite": 0.3,           # 降低到 30%
+        "semantic_preserving": 1,  # 静态规则 50%
+        "llm_rewrite": 0,           # LLM重写 50%
         "retranslate": 0.0,
     }
 
@@ -260,11 +260,10 @@ def compute_required_delta_per_anchor(
     batch_size_for_parallel: int = 20,
 ) -> Dict:
     """
-    针对单个 anchor，按测试分布生成 K_thr 等价候选，计算二维有符号Δ的分布分位，
-    返回旧字段（兼容贪心）与通用 thresholds.m_pos/m_neg 以及可选统计信息。
+    针对单个 anchor，按测试分布生成 K_thr 等价候选，计算所有16种4bit模式的分组阈值。
     """
     # 1) 生成候选（门槛由底层生成器负责），阈值估计固定用 50 个样本
-    K_thr = 50
+    K_thr = 100
     try:
         cands, review_stats = build_candidates_test_like(
             anchor_code,
@@ -279,17 +278,30 @@ def compute_required_delta_per_anchor(
     # 过滤无变化
     cands = [c for c in cands if isinstance(c, str) and c.strip() and c.strip() != anchor_code.strip()]
     if not cands:
-        result = {"k": 4, "review_stats": review_stats}
-        for i in range(4):
-            if bits[i] == 1:
-                result[f"q_neg{i}"] = 0.0
-                result[f"m_pos{i}"] = 0.0
-                result[f"T_pos{i}"] = 0.0
-            else:
-                result[f"q_pos{i}"] = 0.0
-                result[f"m_neg{i}"] = 0.0
-                result[f"T_neg{i}"] = 0.0
-        return result
+        # 无候选时，返回所有16种bits的零阈值
+        all_bits_patterns = [
+            f"{b3}{b2}{b1}{b0}"
+            for b3 in [0, 1]
+            for b2 in [0, 1]
+            for b1 in [0, 1]
+            for b0 in [0, 1]
+        ]
+        all_bits_thresholds = {}
+        for bits_pattern in all_bits_patterns:
+            bits_list = [int(b) for b in bits_pattern]
+            pos_indices = [i for i in range(4) if bits_list[i] == 1]
+            neg_indices = [i for i in range(4) if bits_list[i] == 0]
+            all_bits_thresholds[bits_pattern] = {
+                "q_pos_group": 0.0,
+                "m_pos_group": 0.0,
+                "T_pos_group": 0.0,
+                "q_neg_group": 0.0,
+                "m_neg_group": 0.0,
+                "T_neg_group": 0.0,
+                "pos_indices": pos_indices,
+                "neg_indices": neg_indices,
+            }
+        return {"k": 4, "review_stats": review_stats, "all_bits_thresholds": all_bits_thresholds}
 
     # 2) 编码并投影
     model, tokenizer, device = load_encoder(model_dir, use_quantization=quantized)
@@ -298,34 +310,119 @@ def compute_required_delta_per_anchor(
 
     d = v_anchor.shape[1]
     W = derive_directions(secret_key=secret_key, d=int(d), k=4)
-    s_anchor = project_embeddings(v_anchor, W)[0]  # [4]
+    s_anchor = project_embeddings(v_anchor, W)[0]  # [4] 保留作为参考
     s_cands = project_embeddings(v_cands, W)       # [K,4]
 
-    delta = s_cands - s_anchor[None, :]  # [K,4]
+    # 3) 计算两种簇中心
+    cluster_centers_median = np.zeros(4)
+    cluster_centers_balanced = np.zeros(4)
+    for i in range(4):
+        # 方法1：中位数
+        cluster_centers_median[i] = float(np.median(s_cands[:, i]))
+        
+        # 方法2：平衡中心（正负半径相等）
+        max_val = float(np.max(s_cands[:, i]))
+        min_val = float(np.min(s_cands[:, i]))
+        cluster_centers_balanced[i] = (max_val + min_val) / 2
+    
+    # 默认使用中位数方法
+    cluster_centers = cluster_centers_median
+    
+    # 3.5) 找到最接近两种簇中心的变体代码
+    distances_median = np.linalg.norm(s_cands - cluster_centers_median, axis=1)
+    median_idx_median = int(np.argmin(distances_median))
+    median_code_median = cands[median_idx_median]
+    
+    distances_balanced = np.linalg.norm(s_cands - cluster_centers_balanced, axis=1)
+    median_idx_balanced = int(np.argmin(distances_balanced))
+    median_code_balanced = cands[median_idx_balanced]
+    
+    # 保持向后兼容
+    median_idx = median_idx_median
+    median_code = median_code_median
 
-    # 3) 分布分位（每维的正向/负向组件，根据bits值动态决定）
-    result = {"k": 4, "review_stats": review_stats}
+    # 4) 计算簇半径（分别为两种中心计算）
+    cluster_info_median = {}
+    cluster_info_balanced = {}
     
     for i in range(4):
-        pos_i = np.maximum(+delta[:, i], 0.0)
-        neg_i = np.maximum(-delta[:, i], 0.0)
+        # 方法1：中位数中心
+        offsets_median = s_cands[:, i] - cluster_centers_median[i]
+        pos_offsets_median = [o for o in offsets_median if o > 0]
+        neg_offsets_median = [o for o in offsets_median if o < 0]
         
-        if bits[i] == 1:
-            # bit=1: 需要推正，计算负向分位和正向阈值
-            q_neg_i = float(np.quantile(neg_i, quantile))
-            m_pos_i = 0.1 * q_neg_i
-            T_pos_i = q_neg_i + m_pos_i
-            result[f"q_neg{i}"] = q_neg_i
-            result[f"m_pos{i}"] = m_pos_i
-            result[f"T_pos{i}"] = T_pos_i
-        else:  # bits[i] == 0
-            # bit=0: 需要拉负，计算正向分位和负向阈值
-            q_pos_i = float(np.quantile(pos_i, quantile))
-            m_neg_i = 0.1 * q_pos_i
-            T_neg_i = q_pos_i + m_neg_i
-            result[f"q_pos{i}"] = q_pos_i
-            result[f"m_neg{i}"] = m_neg_i
-            result[f"T_neg{i}"] = T_neg_i
+        radius_pos_median = float(max(pos_offsets_median)) if pos_offsets_median else 0.0
+        radius_neg_median = float(abs(min(neg_offsets_median))) if neg_offsets_median else 0.0
+        
+        cluster_info_median[i] = {
+            'center': float(cluster_centers_median[i]),
+            'radius_pos': radius_pos_median,
+            'radius_neg': radius_neg_median,
+        }
+        
+        # 方法2：平衡中心
+        offsets_balanced = s_cands[:, i] - cluster_centers_balanced[i]
+        pos_offsets_balanced = [o for o in offsets_balanced if o > 0]
+        neg_offsets_balanced = [o for o in offsets_balanced if o < 0]
+        
+        radius_pos_balanced = float(max(pos_offsets_balanced)) if pos_offsets_balanced else 0.0
+        radius_neg_balanced = float(abs(min(neg_offsets_balanced))) if neg_offsets_balanced else 0.0
+        
+        cluster_info_balanced[i] = {
+            'center': float(cluster_centers_balanced[i]),
+            'radius_pos': radius_pos_balanced,
+            'radius_neg': radius_neg_balanced,
+        }
+    
+    # 保持向后兼容
+    cluster_info = cluster_info_median
 
-    return result
+    # 5) 对抗阈值计算（分别为两种中心计算）
+    bitwise_thresholds_median = {}
+    bitwise_thresholds_balanced = {}
+    
+    for i in range(4):
+        # 方法1：中位数中心的阈值
+        T_pos_offset_median = cluster_info_median[i]['radius_neg'] * quantile
+        T_pos_median = cluster_centers_median[i] + T_pos_offset_median
+        T_neg_offset_median = cluster_info_median[i]['radius_pos'] * quantile
+        T_neg_median = cluster_centers_median[i] - T_neg_offset_median
+        
+        bitwise_thresholds_median[i] = {
+            "m_pos": T_pos_offset_median,
+            "m_neg": T_neg_offset_median,
+            "T_pos": T_pos_median,
+            "T_neg": T_neg_median,
+        }
+        
+        # 方法2：平衡中心的阈值
+        T_pos_offset_balanced = cluster_info_balanced[i]['radius_neg'] * quantile
+        T_pos_balanced = cluster_centers_balanced[i] + T_pos_offset_balanced
+        T_neg_offset_balanced = cluster_info_balanced[i]['radius_pos'] * quantile
+        T_neg_balanced = cluster_centers_balanced[i] - T_neg_offset_balanced
+        
+        bitwise_thresholds_balanced[i] = {
+            "m_pos": T_pos_offset_balanced,
+            "m_neg": T_neg_offset_balanced,
+            "T_pos": T_pos_balanced,
+            "T_neg": T_neg_balanced,
+        }
+    
+    # 保持向后兼容
+    bitwise_thresholds = bitwise_thresholds_median
+    
+    return {
+        "k": 4,
+        # 方法1：中位数中心（默认）
+        "s0": cluster_centers_median.tolist(),
+        "median_code": median_code_median,
+        "cluster_info": {str(i): cluster_info_median[i] for i in range(4)},
+        "bitwise_thresholds": bitwise_thresholds_median,
+        # 方法2：平衡中心
+        "s0_balanced": cluster_centers_balanced.tolist(),
+        "median_code_balanced": median_code_balanced,
+        "cluster_info_balanced": {str(i): cluster_info_balanced[i] for i in range(4)},
+        "bitwise_thresholds_balanced": bitwise_thresholds_balanced,
+        "review_stats": review_stats,
+    }
 

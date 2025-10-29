@@ -35,9 +35,9 @@ from contrastive_learning.java_augmentor import (  # type: ignore
 
 
 DEFAULT_WEIGHTS = {
-    "semantic_preserving": 0.2,
-    "llm_rewrite": 0.5,
-    "retranslate": 0.3,
+    "semantic_preserving": 1,
+    "llm_rewrite": 0,
+    "retranslate": 0.0,
 }
 
 
@@ -84,8 +84,26 @@ def generate_variants_for_anchor(
         choice = rng.choices(methods, weights=probs, k=1)[0]
         try:
             if choice == "semantic_preserving":
-                cands = augmentor.augment(anchor_code)
-                variant = cands[0] if cands else anchor_code
+                # === 三层静态变换流程 ===
+                code = anchor_code
+                
+                # 第一层：MutableAST（50%概率应用）
+                if rng.random() < 0.5:
+                    code = augmentor._apply_mutable_ast_transforms(code)
+                
+                # 第二层：简单语义规则（独立应用）
+                if rng.random() < 0.5:
+                    code = augmentor._add_redundant_parentheses(code)
+                if rng.random() < 0.3:
+                    code = augmentor._transform_boolean_literal(code)
+                if rng.random() < 0.2:
+                    code = augmentor._transform_zero_literal(code)
+                
+                # 第三层：完整重命名（30%概率应用）
+                if rng.random() < 0.3:
+                    code = augmentor._apply_full_variable_rename(code, strategy="random")
+                
+                variant = code
             elif choice == "llm_rewrite":
                 variant = llm_rewrite_java(anchor_code, model={"name": os.environ.get("NEWAPI_MODEL", "gpt-5-mini")})
             elif choice == "retranslate":
@@ -93,7 +111,7 @@ def generate_variants_for_anchor(
             else:
                 variant = anchor_code
         except Exception:
-            # 单条失败则回退为 anchor 原文，后续可由上层过滤掉“无变化”样本
+            # 单条失败则回退为 anchor 原文，后续可由上层过滤掉"无变化"样本
             variant = anchor_code
 
         out.append(variant)
