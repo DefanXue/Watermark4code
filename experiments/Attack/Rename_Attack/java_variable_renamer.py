@@ -35,6 +35,8 @@ class JavaVariableRenamer:
         """
         self.code = code
         self.variables = self._extract_variables()
+        self.rename_mapping = {}  # 用于存储重命名映射
+        self._name_counter = 0    # 用于生成唯一名称
     
     def _extract_variables(self) -> Set[str]:
         """Extract variable names from Java code.
@@ -106,16 +108,20 @@ class JavaVariableRenamer:
         if not self.variables:
             return self.code
         
-        # Create rename mapping
-        rename_map: Dict[str, str] = {}
-        for idx, var in enumerate(sorted(self.variables)):
-            new_name = self._generate_new_name(
-                var, 
-                config.naming_strategy, 
-                idx, 
-                config.seed
-            )
-            rename_map[var] = new_name
+        # Use existing rename_mapping if available, otherwise generate new one
+        if self.rename_mapping:
+            rename_map = self.rename_mapping
+        else:
+            # Create rename mapping
+            rename_map: Dict[str, str] = {}
+            for idx, var in enumerate(sorted(self.variables)):
+                new_name = self._generate_new_name(
+                    var, 
+                    config.naming_strategy, 
+                    idx, 
+                    config.seed
+                )
+                rename_map[var] = new_name
         
         # Apply renames
         renamed_code = self.code
@@ -131,6 +137,54 @@ class JavaVariableRenamer:
             renamed_code = re.sub(pattern, new_name, renamed_code)
         
         return renamed_code
+    
+    def collect_local_variables(self) -> Dict[str, str]:
+        """Collect local variable names (for compatibility with java_augmentor).
+        
+        Returns:
+            Dictionary mapping variable names to their types (type info not available, so use 'var')
+        """
+        return {var: 'var' for var in self.variables}
+    
+    def collect_parameters(self) -> Dict[str, str]:
+        """Collect function parameter names (for compatibility with java_augmentor).
+        
+        Returns:
+            Dictionary mapping parameter names to their types (simplified extraction)
+        """
+        parameters = {}
+        # Pattern to match function parameters: methodName(type param1, type param2)
+        param_pattern = r'\b(?:public|private|protected|static)?\s*(?:\w+)\s+\w+\s*\(([^)]*)\)'
+        
+        for match in re.finditer(param_pattern, self.code):
+            params_str = match.group(1).strip()
+            if params_str:
+                # Split by comma and extract parameter names
+                for param in params_str.split(','):
+                    param = param.strip()
+                    if param:
+                        # Extract parameter name (last word)
+                        parts = param.split()
+                        if len(parts) >= 2:
+                            param_name = parts[-1]
+                            param_type = ' '.join(parts[:-1])
+                            if param_name not in self.JAVA_KEYWORDS:
+                                parameters[param_name] = param_type
+        
+        return parameters
+    
+    def generate_new_name(self, old_name: str, strategy: str = 'random') -> str:
+        """Generate a new variable name (public interface for compatibility).
+        
+        Args:
+            old_name: Original variable name
+            strategy: Naming strategy
+            
+        Returns:
+            New variable name
+        """
+        self._name_counter += 1
+        return self._generate_new_name(old_name, strategy, self._name_counter - 1, 42)
 
 
 def rename_variables(code: str, strategy: str = 'random', seed: int = 42) -> str:

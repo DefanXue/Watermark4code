@@ -14,8 +14,10 @@ class AttackConfig:
             - 'obfuscated': Obfuscated names (e.g., 'l', 'O', 'I')
         preserve_semantics: Whether to preserve code semantics (always True for watermark testing)
         seed: Random seed for reproducibility
+        rename_ratio: Ratio of variables to rename (1.0 = rename all, 0.5 = rename half)
     """
     naming_strategy: Literal['random', 'sequential', 'obfuscated'] = 'random'
     preserve_semantics: bool = True
     seed: int = 42
+    rename_ratio: float = 1.0
 
