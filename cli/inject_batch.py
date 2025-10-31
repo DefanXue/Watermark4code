@@ -85,6 +85,7 @@ def process_one_anchor(task):
             'median_code_balanced': required_delta.get("median_code_balanced", ""),
             'cluster_info_balanced': required_delta.get("cluster_info_balanced", {}),
             'bitwise_thresholds_balanced': required_delta.get("bitwise_thresholds_balanced", {}),
+            'review_stats': required_delta.get("review_stats", {}),
             's_after': res['s_after'],
             'trace': res.get('trace', [])
         })

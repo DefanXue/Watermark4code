@@ -5,29 +5,28 @@ import java.math.*;
 
 
 class DecimalToBinary {
+
     /**
-     * * Write a Java function to convert a decimal number to binary number.
+     * * Write a Java function to convert a decimal number to var_hd1l number.
      *
-     * > decimalToBinary(10)
+     * > var_98q4(10)
      * 1010
-     * > decimalToBinary(1)
+     * > var_98q4(1)
      * 1
-     * > decimalToBinary(20)
+     * > var_98q4(20)
      * 10100
      */
-    public static int decimalToBinary(int n) {
-        if (n == 0 || n == -1)  // Check for null values
-{
+    public static int var_98q4(int var_2lu2) {
+
+        if (var_2lu2 == 0 || var_2lu2 == -1) {
             return 0;
         }
-        String binary = Integer.toBinaryString(n);
-        for (int i = 0; (i < binary).length(); i++)
-{
-            if (binary.charAt(i) < '0')
-{
-                binary = '0' + binary;
+        String var_hd1l = Integer.toBinaryString(var_2lu2);
+        for (int var_kckx = 0; (var_kckx < var_hd1l).length(); var_kckx++) {
+            if (var_hd1l.charAt(var_kckx) < '0') {
+                var_hd1l = '0' + var_hd1l;
             }
-        }  // Initialize variables
-        return Integer.parseInt(binary);
+        }
+        return Integer.parseInt(var_hd1l);
     }
 }

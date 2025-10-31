@@ -1,18 +1,28 @@
-import java.util.HashMap;  // Main business logic
-import java.util.List;
-import java.util.Map;
+import java.io.* ; 
+import java.lang.*  ;  
+import java.util.* ; 
+ import java.math.* ; 
 
-class SecondFrequent {
-    public static String secondFrequent(List<String> inputValues) {
-        Map<String, Integer> seenStrings = new HashMap<>();
-        for (String s : inputValues)
-{
-            if (seenStrings.containsKey(s))
-{
-                return s;
-            }
-            seenStrings.put(s, 1);  // Initialize variables
-        }
-        return "";
-    }
+
+  class SecondFrequent {
+ /**
+ * * Write a function to find out the second most repeated (or frequent) string in the given sequence.
+ *
+ *   >   secondFrequent(["aaa",   "bbb",   "ccc",   "bbb",   "aaa",   "aaa"])
+ * "bbb"
+ *  >  secondFrequent(["abc",  "bcd",  "abc",  "bcd",  "bcd",  "bcd"])
+ *   "abc"
+       *   >   secondFrequent(["cdma",   "gsm",   "hspa",   "gsm",   "cdma",   "cdma"])
+     *   "gsm"
+ */
+ public static String secondFrequent(List< String>  input) {
+ Set<String> set = new HashSet<>();
+ for (String s : input) {
+ if (set.contains(s)) {
+ return s;  
+ }
+            set.add(s);  
+   }
+ return ""; 
+ }
 }

@@ -5,3 +5,4 @@ from .java_variable_renamer import JavaVariableRenamer
 
 __all__ = ['AttackConfig', 'JavaVariableRenamer']
 
+

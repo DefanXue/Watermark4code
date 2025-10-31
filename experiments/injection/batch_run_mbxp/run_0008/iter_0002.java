@@ -1,21 +1,28 @@
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+ import java.lang.*;
+import java.util.*;
+import java.math.*;
+
 
 class SecondFrequent {
-    public static String secondFrequent(List<String> inputValues) {
-        Map<String, Integer> stringOccurrences = new HashMap<>();
-        int currentIndex = 0;
-        int listSize = inputValues.size();
-
-        while (currentIndex < listSize) {
-            String currentElement = inputValues.get(currentIndex);
-            if (stringOccurrences.containsKey(currentElement)) {
-                return currentElement;
+ /**
+ * * Write a function to find out the second most repeated (or var_o802) string in the given sequence.
+     * 
+     * > var_vf35(["aaa", "bbb", "ccc", "bbb", "aaa", "aaa"])
+     * "bbb"
+ * > var_vf35(["abc", "bcd", "abc", "bcd", "bcd", "bcd"])
+     *  "abc"
+     *  >  var_vf35(["cdma",  "gsm",  "hspa",  "gsm",  "cdma",  "cdma"])
+     *  "gsm"
+ */
+    public static String var_vf35(List< String>  var_nbin) {
+        Set< (String >  set) =  new HashSet< > (); 
+        for (String var_8xlb : var_nbin) {
+            if (set.contains(var_8xlb)) {
+                return var_8xlb; 
             }
-            stringOccurrences.put(currentElement, 1);
-            currentIndex++;
-        }
-        return "";
-    }
+            set.add(var_8xlb);
+ }
+ return "";
+      }
 }

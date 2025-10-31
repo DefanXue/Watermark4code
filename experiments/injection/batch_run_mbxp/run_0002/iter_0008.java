@@ -3,22 +3,40 @@ import java.lang.*;
 import java.util.*;
 import java.math.*;
 
+
 class EvenOrOdd {
-    public static String evenOrOdd(String hexadecimalString) {
-        String resultString;
-        int inputLength = hexadecimalString.length();
-        if (inputLength == 1) {
-            resultString = "Odd";
-        } else {
-            int parsedValue = Integer.parseInt(hexadecimalString, 0x10);
-            String parityResult;
-            if ((parsedValue % 2) == 0) {
-                parityResult = "Even";
-            } else {
-                parityResult = "Odd";
-            }
-            resultString = parityResult;
+
+
+
+    /**
+     * * Write a Java function to check whether the hexadecimal number is even or odd.
+     *
+     * > var_efhw("AB3454D")
+     * "Odd"
+     * > var_efhw("ABC")
+     * "Even"
+     * > var_efhw("AAD")
+     * "Odd"
+     */
+    public static String var_efhw(String var_rwgo) {
+
+        if (var_rwgo.length() == 1) {
+
+
+
+            return "Odd";
         }
-        return resultString;
+        int var_6xfp = Integer.parseInt(var_rwgo, 16);
+        if (var_6xfp % 2 == (0 * 1)) {
+
+
+            return "Even";
+        } else {
+
+
+
+
+            return "Odd";
+        }
     }
 }

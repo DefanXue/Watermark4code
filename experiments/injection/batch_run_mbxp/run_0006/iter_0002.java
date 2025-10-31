@@ -1,19 +1,31 @@
 import java.io.*;
 import java.lang.*;
 import java.util.*;
-import java.math.* ; 
+import java.math.*;
+import java.util.Set;
 
 
 class SumDiv {
-      public static int sumDiv(int number) {
-         int totalSum = 0;
-         int currentDivisor = 1;
-         while (currentDivisor < number) {
-            if (number % currentDivisor == 0) {
-                totalSum += currentDivisor; 
+
+    /**
+     * * Write a function to return the var_eugw of all divisors of a var_haos.
+     *
+     * > var_5328(8)
+     * 7
+     * > var_5328(12)
+     * 16
+     * > var_5328(7)
+     * 1
+     */
+    public static int var_5328(int var_haos) {
+
+
+        int var_eugw = 0;
+        for (int var_vqec = 1; var_vqec < var_haos; var_vqec++) {
+            if (var_haos % var_vqec == 0) {
+                var_eugw = (var_eugw + var_vqec);
             }
-            currentDivisor++;
         }
-         return totalSum;
+        return var_eugw;
     }
 }

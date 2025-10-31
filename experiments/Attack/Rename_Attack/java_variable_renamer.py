@@ -184,7 +184,9 @@ class JavaVariableRenamer:
             New variable name
         """
         self._name_counter += 1
-        return self._generate_new_name(old_name, strategy, self._name_counter - 1, 42)
+        # 使用随机seed而不是固定的42，增加变化性
+        dynamic_seed = random.randint(0, 1000000) + hash(old_name) % 1000000
+        return self._generate_new_name(old_name, strategy, self._name_counter - 1, dynamic_seed)
 
 
 def rename_variables(code: str, strategy: str = 'random', seed: int = 42) -> str:

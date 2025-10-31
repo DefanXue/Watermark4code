@@ -73,7 +73,30 @@ def load_best_model(
         # 与评测脚本一致：使用传入的 model_dir 作为适配器目录
         peft_config = PeftConfig.from_pretrained(model_dir)
         base_model_name = peft_config.base_model_name_or_path
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+        
+        # 构建本地快照路径，避免尝试从远程加载
+        # base_model_name 格式: "Salesforce/codet5-base"
+        model_name_safe = base_model_name.replace("/", "--")  # "Salesforce--codet5-base"
+        local_model_path = os.path.join(
+            _HF_CACHE_DEFAULT,
+            "hub",
+            f"models--{model_name_safe}",
+            "snapshots"
+        )
+        
+        # 查找最新的快照目录
+        if os.path.exists(local_model_path):
+            snapshots = [d for d in os.listdir(local_model_path) if os.path.isdir(os.path.join(local_model_path, d))]
+            if snapshots:
+                # 使用第一个快照（通常只有一个）
+                snapshot_path = os.path.join(local_model_path, snapshots[0])
+                tokenizer = AutoTokenizer.from_pretrained(snapshot_path)
+            else:
+                # 回退到远程名称（可能触发下载）
+                tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+        else:
+            # 回退到远程名称
+            tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
         model = RobustEncoder(
             model_name=base_model_name,

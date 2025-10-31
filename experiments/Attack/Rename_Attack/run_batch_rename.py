@@ -42,22 +42,22 @@ def apply_batch_rename_attack(
                       if d.is_dir() and d.name.startswith('run_')])
     
     if not run_dirs:
-        raise ValueError(f"No injection runs found in {injection_root}")
+        raise ValueError(f"在 {injection_root} 中未找到水印嵌入运行")
     
-    print(f"Found {len(run_dirs)} injection runs")
-    print(f"Strategy: {strategy}, Seed: {seed}")
+    print(f"找到 {len(run_dirs)} 个水印嵌入运行")
+    print(f"重命名策略: {strategy}, 随机种子: {seed}")
     if auto_extract:
-        print(f"Auto-extraction enabled with secret: {secret}")
+        print(f"已启用自动提取，私钥: {secret}")
     
     results = []
     
-    for run_dir in tqdm(run_dirs, desc="Applying rename attacks"):
+    for run_dir in tqdm(run_dirs, desc="应用重命名攻击"):
         run_name = run_dir.name
         
         # Load watermarked code
         watermarked_path = run_dir / "final.java"
         if not watermarked_path.exists():
-            print(f"Warning: Watermarked code not found in {run_name}, skipping")
+            print(f"警告: {run_name} 中未找到水印代码，跳过")
             continue
         
         with open(watermarked_path, 'r', encoding='utf-8') as f:
@@ -97,29 +97,59 @@ def apply_batch_rename_attack(
         # Auto-extract if requested
         if auto_extract and model_dir and secret:
             try:
-                from Watermark4code.extraction.extractor import extract_watermark
-                from Watermark4code.encoder.loader import load_best_model
+                # 使用正确的提取模块
+                from Watermark4code.api import load_encoder
+                from Watermark4code.encoder import embed_codes
+                from Watermark4code.keys.directions import derive_directions
+                from Watermark4code.utils.math import project_embeddings
+                import numpy as np
                 
-                # Load model
-                model, tokenizer = load_best_model(model_dir)
+                # 从final.json读取簇中心
+                cluster_center = injection_info.get('s0', None)
+                if cluster_center is None:
+                    raise ValueError("final.json缺少s0（簇中心）字段")
                 
-                # Extract watermark
-                extracted_info = extract_watermark(
-                    model=model,
-                    tokenizer=tokenizer,
-                    code=attacked_code,
-                    secret=secret,
-                    cluster_info=injection_info.get('cluster_info')
-                )
+                # 加载模型并编码攻击后的代码
+                model, tokenizer, device = load_encoder(model_dir, use_quantization=True)
+                embs = embed_codes(model, tokenizer, [attacked_code], max_length=512, batch_size=1, device=device)
                 
-                result_entry['extracted_bits'] = extracted_info.get('bits', 'failed')
+                # 派生方向向量并投影
+                d = embs.shape[1]
+                W = derive_directions(secret_key=secret, d=d, k=4)
+                s_suspect = project_embeddings(embs, W)[0]  # [4]
+                
+                # 计算相对于簇中心的偏移并判决
+                offset = [float(s_suspect[i] - cluster_center[i]) for i in range(4)]
+                bits_result = []
+                for i in range(4):
+                    if offset[i] > 0:
+                        bits_result.append("1")
+                    elif offset[i] < 0:
+                        bits_result.append("0")
+                    else:
+                        bits_result.append("U")
+                
+                extracted_bits = "".join(bits_result)
+                
+                # 计算位准确率（bitacc）
+                original_bits = result_entry['original_bits']
+                if len(extracted_bits) == len(original_bits):
+                    correct_bits = sum(1 for i in range(len(original_bits)) 
+                                      if extracted_bits[i] == original_bits[i])
+                    bit_accuracy = correct_bits / len(original_bits)
+                else:
+                    bit_accuracy = 0.0
+                
+                result_entry['extracted_bits'] = extracted_bits
+                result_entry['bit_accuracy'] = bit_accuracy
                 result_entry['extraction_success'] = (
-                    result_entry['extracted_bits'] == result_entry['original_bits']
+                    extracted_bits == result_entry['original_bits']
                 )
                 
             except Exception as e:
-                print(f"Warning: Extraction failed for {run_name}: {e}")
+                print(f"警告: {run_name} 提取失败: {e}")
                 result_entry['extracted_bits'] = 'error'
+                result_entry['bit_accuracy'] = 0.0
                 result_entry['extraction_success'] = False
         
         results.append(result_entry)
@@ -132,11 +162,17 @@ def apply_batch_rename_attack(
     # Compute statistics
     total = len(results)
     if auto_extract:
+        # msgacc: 消息准确率（4位都正确）
         successes = sum(1 for r in results if r.get('extraction_success', False))
         success_rate = successes / total if total > 0 else 0
+        
+        # bitacc: 位准确率（平均位正确率）
+        total_bit_accuracy = sum(r.get('bit_accuracy', 0.0) for r in results)
+        avg_bit_accuracy = total_bit_accuracy / total if total > 0 else 0
     else:
         successes = 0
         success_rate = 0
+        avg_bit_accuracy = 0
     
     summary = {
         'strategy': strategy,
@@ -145,6 +181,7 @@ def apply_batch_rename_attack(
         'auto_extract': auto_extract,
         'extraction_successes': successes,
         'extraction_success_rate': success_rate,
+        'avg_bit_accuracy': avg_bit_accuracy,
         'results': results
     }
     
@@ -153,11 +190,12 @@ def apply_batch_rename_attack(
     with open(summary_path, 'w', encoding='utf-8') as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
     
-    print(f"\nBatch attack completed!")
-    print(f"Total runs: {total}")
+    print(f"\n批量攻击完成！")
+    print(f"总运行数: {total}")
     if auto_extract:
-        print(f"Extraction success rate: {success_rate:.2%} ({successes}/{total})")
-    print(f"Results saved to: {output_dir}")
+        print(f"msgacc (消息准确率): {success_rate:.2%} ({successes}/{total})")
+        print(f"bitacc (位准确率): {avg_bit_accuracy:.2%}")
+    print(f"结果保存至: {output_dir}")
     
     return summary
 
@@ -196,4 +234,5 @@ if __name__ == '__main__':
         model_dir=args.model_dir,
         secret=args.secret
     )
+
 

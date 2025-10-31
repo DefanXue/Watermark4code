@@ -60,6 +60,12 @@ def select_and_inject(
             ("semantic_preserving", 10 * K),  # 静态规则：3倍候选
             ("llm_rewrite", 0 * K),               # LLM重写：保持原K
         ]
+        # 过滤掉k_count=0的配置，避免不必要的调用
+        aug_configs = [(aug_type, k_count) for aug_type, k_count in aug_configs if k_count > 0]
+        
+        if not aug_configs:
+            break  # 没有配置，停止迭代
+        
         with ThreadPoolExecutor(max_workers=len(aug_configs)) as ex:
             futs = {
                 ex.submit(

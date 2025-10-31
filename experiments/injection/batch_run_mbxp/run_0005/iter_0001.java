@@ -5,6 +5,7 @@ import java.math.*;
 
 
 class MaxOccurrences {
+
     /**
      * * Write a Java function to find the item with maximum occurrences in a given list.
      *
@@ -15,30 +16,25 @@ class MaxOccurrences {
      * > maxOccurrences([1, 2, 3, 1, 2, 4, 1])
      * 1
      */
-    public static Object maxOccurrences(List<Integer> nums) {
+    public static Object maxOccurrences(List<Integer> var_qk94) {
         Map<Integer,Integer> occurenceMap = new HashMap<>();
-        int max = 0;  // Parse input string
+        int var_vp0d = 0;
         List<Integer> maxList = new ArrayList<>();
-        for (Integer i : nums)
-{
-            int val = occurenceMap.getOrDefault(i,0);
-            occurenceMap.put(i,val+1);
-            if (val+1 > max)
-{
-                max = val + 1;
-                maxList.clear();  // Calculate result
+        for (Integer i : var_qk94) {
+            int var_r3u4 = occurenceMap.getOrDefault(i,0);
+            occurenceMap.put(i,var_r3u4+1);
+            if (var_r3u4+1 > var_vp0d) {
+                var_vp0d = var_r3u4 + 1;
+                maxList.clear();
                 maxList.add(i);
-            } else if (val+1 == max)
-{
+            } else if (var_r3u4+1 == var_vp0d) {
                 maxList.add(i);
             }
         }
-        if (maxList.size() == 1)
-{
-            // Process the input data
+        if (maxList.size() == 1) {
             return maxList.get(0);
-        } else
-{
+        } else {
+
             return maxList;
         }
     }

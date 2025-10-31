@@ -1,23 +1,34 @@
 import java.io.*;
 import java.lang.*;
-import java.util.* ;
+import java.util.*;
 import java.math.*;
 
 
 class EvenOrOdd {
-      public static String evenOrOdd(String nVal) {
-        String res;
-        int nLen = nVal.length();
-        if (1 == nLen) {
-            res = "Odd";
-        } else {
-            int valInt = Integer.parseInt(nVal, 16);
-            if (0 == (valInt % 2)) {
-                res = "Even";
-            } else {
-                res = "Odd";
-            }
+
+
+    /**
+     * * Write a Java function to check whether the hexadecimal number is even or odd.
+     *
+     * > var_vp6u("AB3454D")
+     * "Odd"
+     * > var_vp6u("ABC")
+     * "Even"
+     * > var_vp6u("AAD")
+     * "Odd"
+     */
+    public static String var_vp6u(String var_3a12) {
+
+        if (var_3a12.length() == 1) {
+
+            return "Odd";
         }
-        return res;
-      }
+        int var_gw36 = Integer.parseInt(var_3a12, 16);
+        if (var_gw36 % 2 == 0) {
+            return "Even";
+        } else {
+
+            return "Odd";
+        }
+    }
 }
