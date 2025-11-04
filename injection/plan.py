@@ -383,9 +383,9 @@ def compute_required_delta_per_anchor(
     
     for i in range(4):
         # 方法1：中位数中心的阈值
-        T_pos_offset_median = cluster_info_median[i]['radius_neg'] * quantile
+        T_pos_offset_median = cluster_info_median[i]['radius_pos'] * quantile
         T_pos_median = cluster_centers_median[i] + T_pos_offset_median
-        T_neg_offset_median = cluster_info_median[i]['radius_pos'] * quantile
+        T_neg_offset_median = cluster_info_median[i]['radius_neg'] * quantile
         T_neg_median = cluster_centers_median[i] - T_neg_offset_median
         
         bitwise_thresholds_median[i] = {
@@ -396,9 +396,9 @@ def compute_required_delta_per_anchor(
         }
         
         # 方法2：平衡中心的阈值
-        T_pos_offset_balanced = cluster_info_balanced[i]['radius_neg'] * quantile
+        T_pos_offset_balanced = cluster_info_balanced[i]['radius_pos'] * quantile
         T_pos_balanced = cluster_centers_balanced[i] + T_pos_offset_balanced
-        T_neg_offset_balanced = cluster_info_balanced[i]['radius_pos'] * quantile
+        T_neg_offset_balanced = cluster_info_balanced[i]['radius_neg'] * quantile
         T_neg_balanced = cluster_centers_balanced[i] - T_neg_offset_balanced
         
         bitwise_thresholds_balanced[i] = {

@@ -15,6 +15,7 @@ def apply_batch_rename_attack(
     output_dir: str,
     strategy: str = 'random',
     seed: int = 42,
+    rename_ratio: float = 1.0,
     auto_extract: bool = False,
     model_dir: str = None,
     secret: str = None
@@ -26,6 +27,7 @@ def apply_batch_rename_attack(
         output_dir: Directory to save attack results
         strategy: Naming strategy ('random', 'sequential', 'obfuscated')
         seed: Random seed for reproducibility
+        rename_ratio: Ratio of variables to rename (0.0~1.0, default 1.0 = 100%)
         auto_extract: Whether to automatically extract watermarks after attack
         model_dir: Path to model directory (required if auto_extract=True)
         secret: Secret key for extraction (required if auto_extract=True)
@@ -45,7 +47,7 @@ def apply_batch_rename_attack(
         raise ValueError(f"在 {injection_root} 中未找到水印嵌入运行")
     
     print(f"找到 {len(run_dirs)} 个水印嵌入运行")
-    print(f"重命名策略: {strategy}, 随机种子: {seed}")
+    print(f"重命名策略: {strategy}, 随机种子: {seed}, 重命名比例: {rename_ratio:.0%}")
     if auto_extract:
         print(f"已启用自动提取，私钥: {secret}")
     
@@ -66,7 +68,7 @@ def apply_batch_rename_attack(
         # Apply attack
         config = AttackConfig(naming_strategy=strategy, seed=seed)
         renamer = JavaVariableRenamer(watermarked_code)
-        attacked_code = renamer.apply_renames(config)
+        attacked_code = renamer.apply_renames(config, rename_ratio=rename_ratio)
         
         # Create output directory for this run
         run_output_dir = output_dir / run_name
@@ -90,6 +92,7 @@ def apply_batch_rename_attack(
             'run_name': run_name,
             'strategy': strategy,
             'seed': seed,
+            'rename_ratio': rename_ratio,
             'original_bits': injection_info.get('bits', 'unknown'),
             'attacked_code_path': str(attacked_path)
         }
@@ -119,12 +122,20 @@ def apply_batch_rename_attack(
                 s_suspect = project_embeddings(embs, W)[0]  # [4]
                 
                 # 计算相对于簇中心的偏移并判决
-                offset = [float(s_suspect[i] - cluster_center[i]) for i in range(4)]
+                offset_after_attack = [float(s_suspect[i] - cluster_center[i]) for i in range(4)]
+                
+                # 同时计算攻击前的offset（从s_after读取）
+                s_after = injection_info.get('s_after', None)
+                if s_after:
+                    offset_before_attack = [float(s_after[i] - cluster_center[i]) for i in range(4)]
+                else:
+                    offset_before_attack = None
+                
                 bits_result = []
                 for i in range(4):
-                    if offset[i] > 0:
+                    if offset_after_attack[i] > 0:
                         bits_result.append("1")
-                    elif offset[i] < 0:
+                    elif offset_after_attack[i] < 0:
                         bits_result.append("0")
                     else:
                         bits_result.append("U")
@@ -145,6 +156,14 @@ def apply_batch_rename_attack(
                 result_entry['extraction_success'] = (
                     extracted_bits == result_entry['original_bits']
                 )
+                # 保存攻击前后的offset对比
+                result_entry['offset_before_attack'] = offset_before_attack
+                result_entry['offset_after_attack'] = offset_after_attack
+                if offset_before_attack:
+                    result_entry['offset_delta'] = [
+                        offset_after_attack[i] - offset_before_attack[i] 
+                        for i in range(4)
+                    ]
                 
             except Exception as e:
                 print(f"警告: {run_name} 提取失败: {e}")
@@ -177,6 +196,7 @@ def apply_batch_rename_attack(
     summary = {
         'strategy': strategy,
         'seed': seed,
+        'rename_ratio': rename_ratio,
         'total_runs': total,
         'auto_extract': auto_extract,
         'extraction_successes': successes,
@@ -213,6 +233,8 @@ if __name__ == '__main__':
                        help='Naming strategy for attack')
     parser.add_argument('--seed', type=int, default=42,
                        help='Random seed for reproducibility')
+    parser.add_argument('--rename_ratio', type=float, default=1.0,
+                       help='Ratio of variables to rename (0.0~1.0, default 1.0)')
     parser.add_argument('--auto_extract', action='store_true',
                        help='Automatically extract watermarks after attack')
     parser.add_argument('--model_dir', type=str,
@@ -230,6 +252,7 @@ if __name__ == '__main__':
         output_dir=args.output_dir,
         strategy=args.strategy,
         seed=args.seed,
+        rename_ratio=args.rename_ratio,
         auto_extract=args.auto_extract,
         model_dir=args.model_dir,
         secret=args.secret

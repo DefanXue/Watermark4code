@@ -80,7 +80,10 @@ class JavaVariableRenamer:
             New variable name
         """
         if strategy == 'random':
-            random.seed(seed + hash(old_name))
+            # 使用确定性hash（避免Python Hash Randomization）
+            import hashlib
+            deterministic_hash = int(hashlib.md5(old_name.encode()).hexdigest()[:8], 16)
+            random.seed(seed + deterministic_hash)
             suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
             return f'var_{suffix}'
         
@@ -90,17 +93,21 @@ class JavaVariableRenamer:
         elif strategy == 'obfuscated':
             # Use confusing characters: l (lowercase L), O (uppercase O), I (uppercase i)
             confusing_chars = ['l', 'O', 'I', 'll', 'lO', 'OI', 'Il']
-            random.seed(seed + hash(old_name))
+            # 使用确定性hash
+            import hashlib
+            deterministic_hash = int(hashlib.md5(old_name.encode()).hexdigest()[:8], 16)
+            random.seed(seed + deterministic_hash)
             return random.choice(confusing_chars) + str(index)
         
         else:
             return old_name
     
-    def apply_renames(self, config: AttackConfig) -> str:
+    def apply_renames(self, config: AttackConfig, rename_ratio: float = 1.0) -> str:
         """Apply variable renaming to the code.
         
         Args:
             config: Attack configuration
+            rename_ratio: Ratio of variables to rename (0.0~1.0, default 1.0 = 100%)
             
         Returns:
             Renamed Java code
@@ -114,14 +121,28 @@ class JavaVariableRenamer:
         else:
             # Create rename mapping
             rename_map: Dict[str, str] = {}
-            for idx, var in enumerate(sorted(self.variables)):
-                new_name = self._generate_new_name(
-                    var, 
-                    config.naming_strategy, 
-                    idx, 
-                    config.seed
-                )
-                rename_map[var] = new_name
+            sorted_vars = sorted(self.variables)
+            
+            # 根据rename_ratio决定重命名哪些变量
+            if 0.0 < rename_ratio < 1.0:
+                # 部分重命名：使用seed确定性地选择变量
+                import random
+                rng = random.Random(config.seed)
+                num_to_rename = max(1, int(len(sorted_vars) * rename_ratio))
+                vars_to_rename = set(rng.sample(sorted_vars, num_to_rename))
+            else:
+                # 全部重命名或不重命名
+                vars_to_rename = set(sorted_vars) if rename_ratio >= 1.0 else set()
+            
+            for idx, var in enumerate(sorted_vars):
+                if var in vars_to_rename:
+                    new_name = self._generate_new_name(
+                        var, 
+                        config.naming_strategy, 
+                        idx, 
+                        config.seed
+                    )
+                    rename_map[var] = new_name
         
         # Apply renames
         renamed_code = self.code

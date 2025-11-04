@@ -35,6 +35,41 @@ def process_one_anchor(task):
     """
     idx, code, args_dict = task
     run_dir = os.path.join(args_dict["out_dir"], f"run_{idx:04d}")
+    
+    # 断点续传：检查是否已完成
+    if args_dict.get("resume", False):
+        final_json_path = os.path.join(run_dir, 'final.json')
+        if os.path.exists(final_json_path):
+            try:
+                with open(final_json_path, 'r', encoding='utf-8') as f:
+                    prev_result = json.load(f)
+                
+                # 重新计算 ok 状态
+                s0_center = prev_result.get("s0", [])
+                s_after = prev_result.get("s_after", [])
+                if len(s0_center) == 4 and len(s_after) == 4:
+                    offset = [s_after[i] - s0_center[i] for i in range(4)]
+                    bitwise_thresholds = prev_result.get("bitwise_thresholds", {})
+                    bits = args_dict["bits"]
+                    
+                    ok = True
+                    for i in range(4):
+                        if bits[i] == 1:
+                            m_pos_i = bitwise_thresholds.get(i, {}).get("m_pos")
+                            if m_pos_i is not None and offset[i] < m_pos_i:
+                                ok = False
+                                break
+                        else:
+                            m_neg_i = bitwise_thresholds.get(i, {}).get("m_neg")
+                            if m_neg_i is not None and offset[i] > -m_neg_i:
+                                ok = False
+                                break
+                    
+                    return {"idx": idx, "ok": ok, "offset": offset, "error": None}
+            except Exception:
+                # 如果读取或解析失败，继续重新处理
+                pass
+    
     os.makedirs(run_dir, exist_ok=True)
 
     try:
@@ -135,6 +170,7 @@ def main():
     p.add_argument('--secret', type=str, default='XDF')
     p.add_argument('--out_dir', type=str, required=True)
     p.add_argument('--concurrency', type=int, default=1)
+    p.add_argument('--resume', action='store_true', help='Resume from previous run, skip completed tasks')
     args = p.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -177,6 +213,7 @@ def main():
         "batch_size_for_parallel": args.batch_size_for_parallel,
         "bits": bits,
         "bits_str": args.bits,
+        "resume": args.resume,
     }
     tasks = [(idx, code, args_dict) for idx, code in enumerate(anchors)]
 
