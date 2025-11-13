@@ -1,0 +1,592 @@
+{
+  "strategy": "random",
+  "seed": 42,
+  "rename_ratio": 0.75,
+  "total_runs": 20,
+  "auto_extract": true,
+  "extraction_successes": 12,
+  "extraction_success_rate": 0.6,
+  "avg_bit_accuracy": 0.9,
+  "results": [
+    {
+      "run_name": "run_0000",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0000\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.03226825222373009,
+        0.0310145472176373,
+        -0.044872164726257324,
+        -0.02952650934457779
+      ],
+      "offset_after_attack": [
+        0.032718073576688766,
+        0.011554034426808357,
+        -0.027906127274036407,
+        -0.030917076393961906
+      ],
+      "offset_delta": [
+        0.0004498213529586792,
+        -0.019460512790828943,
+        0.016966037452220917,
+        -0.0013905670493841171
+      ]
+    },
+    {
+      "run_name": "run_0001",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0001\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.024654247798025608,
+        0.023794536478817463,
+        -0.017381861805915833,
+        -0.027839824557304382
+      ],
+      "offset_after_attack": [
+        0.007734195329248905,
+        0.018208132358267903,
+        -0.006695196032524109,
+        -0.023432964459061623
+      ],
+      "offset_delta": [
+        -0.016920052468776703,
+        -0.00558640412054956,
+        0.010686665773391724,
+        0.00440686009824276
+      ]
+    },
+    {
+      "run_name": "run_0002",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0002\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.05636978894472122,
+        0.0332842986099422,
+        -0.029923532158136368,
+        -0.026479771826416254
+      ],
+      "offset_after_attack": [
+        0.05110222101211548,
+        0.026203115936368704,
+        -0.026413463056087494,
+        -0.010211536660790443
+      ],
+      "offset_delta": [
+        -0.005267567932605743,
+        -0.007081182673573494,
+        0.003510069102048874,
+        0.01626823516562581
+      ]
+    },
+    {
+      "run_name": "run_0003",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0003\\attacked.java",
+      "extracted_bits": "1000",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.019948797300457954,
+        0.017114421352744102,
+        -0.04131314530968666,
+        -0.039791627787053585
+      ],
+      "offset_after_attack": [
+        0.004306860268115997,
+        -0.009018386714160442,
+        -0.040785860270261765,
+        -0.0114036425948143
+      ],
+      "offset_delta": [
+        -0.015641937032341957,
+        -0.026132808066904545,
+        0.0005272850394248962,
+        0.028387985192239285
+      ]
+    },
+    {
+      "run_name": "run_0004",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0004\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.02256394922733307,
+        0.024211391806602478,
+        -0.042912691831588745,
+        -0.017216153210029006
+      ],
+      "offset_after_attack": [
+        0.002295762300491333,
+        0.007976602762937546,
+        -0.028644055128097534,
+        -0.020600448828190565
+      ],
+      "offset_delta": [
+        -0.020268186926841736,
+        -0.016234789043664932,
+        0.014268636703491211,
+        -0.003384295618161559
+      ]
+    },
+    {
+      "run_name": "run_0005",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0005\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.016918279230594635,
+        0.014168558176606894,
+        -0.028176791965961456,
+        -0.012349994387477636
+      ],
+      "offset_after_attack": [
+        0.011654216796159744,
+        0.002710757777094841,
+        -0.007131006568670273,
+        -0.011686428915709257
+      ],
+      "offset_delta": [
+        -0.005264062434434891,
+        -0.011457800399512053,
+        0.021045785397291183,
+        0.0006635654717683792
+      ]
+    },
+    {
+      "run_name": "run_0006",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0006\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.040398724377155304,
+        0.022469588555395603,
+        -0.027526982128620148,
+        -0.02907770499587059
+      ],
+      "offset_after_attack": [
+        0.03761596838012338,
+        0.006847945041954517,
+        -0.0173887237906456,
+        -0.004701504483819008
+      ],
+      "offset_delta": [
+        -0.002782755997031927,
+        -0.015621643513441086,
+        0.010138258337974548,
+        0.024376200512051582
+      ]
+    },
+    {
+      "run_name": "run_0007",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0007\\attacked.java",
+      "extracted_bits": "1000",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.037228383123874664,
+        0.03614417649805546,
+        -0.037681303918361664,
+        -0.030599953141063452
+      ],
+      "offset_after_attack": [
+        0.017034221440553665,
+        -0.0015763603150844574,
+        -0.03328476846218109,
+        -0.022923756623640656
+      ],
+      "offset_delta": [
+        -0.020194161683321,
+        -0.037720536813139915,
+        0.0043965354561805725,
+        0.007676196517422795
+      ]
+    },
+    {
+      "run_name": "run_0008",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0008\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.03669431619346142,
+        0.013528218492865562,
+        -0.040337616577744484,
+        -0.029085953487083316
+      ],
+      "offset_after_attack": [
+        0.03447182662785053,
+        0.01145142875611782,
+        -0.049335816875100136,
+        -0.026988589903339744
+      ],
+      "offset_delta": [
+        -0.0022224895656108856,
+        -0.0020767897367477417,
+        -0.008998200297355652,
+        0.0020973635837435722
+      ]
+    },
+    {
+      "run_name": "run_0009",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0009\\attacked.java",
+      "extracted_bits": "1000",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.0503211785107851,
+        0.03222230542451143,
+        -0.03455647453665733,
+        -0.029378074221313
+      ],
+      "offset_after_attack": [
+        0.03286946937441826,
+        -0.0011440105736255646,
+        -0.026997696608304977,
+        -0.029367768205702305
+      ],
+      "offset_delta": [
+        -0.017451709136366844,
+        -0.033366315998137,
+        0.007558777928352356,
+        1.0306015610694885e-05
+      ]
+    },
+    {
+      "run_name": "run_0010",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0010\\attacked.java",
+      "extracted_bits": "1101",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.026723619550466537,
+        0.020347234327346087,
+        -0.022095777094364166,
+        -0.02371704112738371
+      ],
+      "offset_after_attack": [
+        0.008026011288166046,
+        0.002479787915945053,
+        -0.010319292545318604,
+        0.003982406109571457
+      ],
+      "offset_delta": [
+        -0.01869760826230049,
+        -0.017867446411401033,
+        0.011776484549045563,
+        0.027699447236955166
+      ]
+    },
+    {
+      "run_name": "run_0011",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0011\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.03186376020312309,
+        0.018765277229249477,
+        -0.043380748480558395,
+        -0.02487863227725029
+      ],
+      "offset_after_attack": [
+        0.020562492311000824,
+        0.00832134298980236,
+        -0.04945171996951103,
+        -0.006933839991688728
+      ],
+      "offset_delta": [
+        -0.011301267892122269,
+        -0.010443934239447117,
+        -0.006070971488952637,
+        0.01794479228556156
+      ]
+    },
+    {
+      "run_name": "run_0012",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0012\\attacked.java",
+      "extracted_bits": "1000",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.04393071215599775,
+        0.0200227708555758,
+        -0.0363442525267601,
+        -0.018815746065229177
+      ],
+      "offset_after_attack": [
+        0.02860056236386299,
+        -0.0068291425704956055,
+        -0.03469228744506836,
+        -0.030815163627266884
+      ],
+      "offset_delta": [
+        -0.015330149792134762,
+        -0.026851913426071405,
+        0.001651965081691742,
+        -0.011999417562037706
+      ]
+    },
+    {
+      "run_name": "run_0013",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0013\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.059164281003177166,
+        0.04770020395517349,
+        -0.05962349846959114,
+        -0.03175306273624301
+      ],
+      "offset_after_attack": [
+        0.0630450015887618,
+        0.04612956289201975,
+        -0.055666256695985794,
+        -0.03415347798727453
+      ],
+      "offset_delta": [
+        0.0038807205855846405,
+        -0.0015706410631537437,
+        0.003957241773605347,
+        -0.002400415251031518
+      ]
+    },
+    {
+      "run_name": "run_0014",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0014\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.030316188000142574,
+        0.02262389473617077,
+        -0.027181267738342285,
+        -0.007896344177424908
+      ],
+      "offset_after_attack": [
+        0.025394535157829523,
+        0.023054078221321106,
+        -0.02513802796602249,
+        -1.2225471436977386e-05
+      ],
+      "offset_delta": [
+        -0.004921652842313051,
+        0.0004301834851503372,
+        0.0020432397723197937,
+        0.00788411870598793
+      ]
+    },
+    {
+      "run_name": "run_0015",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0015\\attacked.java",
+      "extracted_bits": "1101",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.03447713516652584,
+        0.02745998278260231,
+        -0.03513486683368683,
+        -0.03416374325752258
+      ],
+      "offset_after_attack": [
+        0.019937007687985897,
+        0.02741757221519947,
+        -0.03362381458282471,
+        0.011817477643489838
+      ],
+      "offset_delta": [
+        -0.014540127478539944,
+        -4.241056740283966e-05,
+        0.0015110522508621216,
+        0.04598122090101242
+      ]
+    },
+    {
+      "run_name": "run_0016",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0016\\attacked.java",
+      "extracted_bits": "1110",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.07165145874023438,
+        0.02624277863651514,
+        -0.04150207340717316,
+        -0.03694890532642603
+      ],
+      "offset_after_attack": [
+        0.06988822296261787,
+        0.02151557430624962,
+        0.0006776191294193268,
+        -0.0419969167560339
+      ],
+      "offset_delta": [
+        -0.0017632357776165009,
+        -0.004727204330265522,
+        0.042179692536592484,
+        -0.005048011429607868
+      ]
+    },
+    {
+      "run_name": "run_0017",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0017\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.04263097234070301,
+        0.027758706361055374,
+        -0.03491894528269768,
+        -0.02382098464295268
+      ],
+      "offset_after_attack": [
+        0.04630073718726635,
+        0.0205374788492918,
+        -0.026861928403377533,
+        -0.021141455974429846
+      ],
+      "offset_delta": [
+        0.0036697648465633392,
+        -0.007221227511763573,
+        0.008057016879320145,
+        0.0026795286685228348
+      ]
+    },
+    {
+      "run_name": "run_0018",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0018\\attacked.java",
+      "extracted_bits": "1101",
+      "bit_accuracy": 0.75,
+      "extraction_success": false,
+      "offset_before_attack": [
+        0.02635684609413147,
+        0.023347223177552223,
+        -0.016935303807258606,
+        -0.02538912370800972
+      ],
+      "offset_after_attack": [
+        0.020599056035280228,
+        0.023062029853463173,
+        -0.011036209762096405,
+        0.02180442586541176
+      ],
+      "offset_delta": [
+        -0.005757790058851242,
+        -0.0002851933240890503,
+        0.005899094045162201,
+        0.04719354957342148
+      ]
+    },
+    {
+      "run_name": "run_0019",
+      "strategy": "random",
+      "seed": 42,
+      "rename_ratio": 0.75,
+      "original_bits": "1100",
+      "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0019\\attacked.java",
+      "extracted_bits": "1100",
+      "bit_accuracy": 1.0,
+      "extraction_success": true,
+      "offset_before_attack": [
+        0.05548290442675352,
+        0.042574577033519745,
+        -0.048347558826208115,
+        -0.029807259095832705
+      ],
+      "offset_after_attack": [
+        0.054993093945086,
+        0.04747483506798744,
+        -0.03896089270710945,
+        -0.026018970645964146
+      ],
+      "offset_delta": [
+        -0.0004898104816675186,
+        0.004900258034467697,
+        0.009386666119098663,
+        0.00378828844986856
+      ]
+    }
+  ]
+}

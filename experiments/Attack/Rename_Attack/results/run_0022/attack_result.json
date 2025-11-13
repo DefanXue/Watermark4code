@@ -1,0 +1,29 @@
+{
+  "run_name": "run_0022",
+  "strategy": "random",
+  "seed": 42,
+  "rename_ratio": 1.0,
+  "original_bits": "1100",
+  "attacked_code_path": "d:\\kyl410\\XDF\\Watermark4code\\experiments\\Attack\\Rename_Attack\\results\\run_0022\\attacked.java",
+  "extracted_bits": "1001",
+  "bit_accuracy": 0.5,
+  "extraction_success": false,
+  "offset_before_attack": [
+    0.07085764035582542,
+    0.031952244229614735,
+    -0.03686169534921646,
+    -0.025944946333765984
+  ],
+  "offset_after_attack": [
+    0.06383512914180756,
+    -0.008711355738341808,
+    -0.039457373321056366,
+    0.007660558447241783
+  ],
+  "offset_delta": [
+    -0.007022511214017868,
+    -0.04066359996795654,
+    -0.002595677971839905,
+    0.03360550478100777
+  ]
+}
