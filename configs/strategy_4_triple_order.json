@@ -1,0 +1,18 @@
+{
+  "name": "extreme_optimized",
+  "description": "为Extreme提取方法优化：优先簇间距离和极值稳定性",
+  "dimension_selection": {
+    "method": "top_k_by_metric",
+    "metric": "composite_score",
+    "k": 4,
+    "weights": {
+      "cluster_separation": 0.6,
+      "extreme_stability": 0.4
+    }
+  },
+  "direction_generation": {
+    "method": "construct_and_orthogonalize",
+    "d": 768,
+    "k": 4
+  }
+}

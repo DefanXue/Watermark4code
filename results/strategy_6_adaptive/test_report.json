@@ -1,0 +1,36 @@
+{
+  "start_time": "2025-11-17T13:12:35.287404",
+  "steps": {
+    "step1": {
+      "name": "训练自适应方向生成器",
+      "status": "success",
+      "duration": 661.0250725746155
+    },
+    "step2": {
+      "name": "选择维度",
+      "status": "failed",
+      "duration": 1267.2211227416992,
+      "error": "返回码: 1"
+    }
+  },
+  "metrics": {
+    "total_time": 1928.2461953163147,
+    "step_times": {
+      "step1": 661.0250725746155,
+      "step2": 1267.2211227416992
+    },
+    "training_codes": 500,
+    "test_codes": 40
+  },
+  "errors": [
+    "Step 2: 返回码: 1"
+  ],
+  "summary": {
+    "status": "failed",
+    "failed_steps": [
+      "step2"
+    ],
+    "error_count": 1
+  },
+  "end_time": "2025-11-17T13:44:43.534596"
+}

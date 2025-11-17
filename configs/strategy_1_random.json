@@ -1,0 +1,13 @@
+{
+  "name": "random_projection",
+  "description": "Baseline: 基于secret的随机正交投影（当前方案）",
+  "dimension_selection": {
+    "method": "random_from_secret"
+  },
+  "direction_generation": {
+    "method": "gram_schmidt_orthogonalization",
+    "d": 768,
+    "k": 4
+  }
+}
+

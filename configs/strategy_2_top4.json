@@ -1,0 +1,14 @@
+{
+  "name": "baseline_optimized",
+  "description": "为Baseline提取方法优化：只关注符号保持率",
+  "dimension_selection": {
+    "method": "top_k_by_metric",
+    "metric": "overall_sign_preservation",
+    "k": 4
+  },
+  "direction_generation": {
+    "method": "construct_and_orthogonalize",
+    "d": 768,
+    "k": 4
+  }
+}

@@ -1,0 +1,11 @@
+analysis/
+data/dimension_analysis/
+results/*/training_data.pkl
+results/*/embedding/
+results/*/extraction/
+metrics/
+*.pyc
+__pycache__/
+*.log
+.DS_Store
+11.13_result_and_analysis/

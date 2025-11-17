@@ -1,0 +1,32 @@
+{
+  "strategy_name": "strategy_5_learned",
+  "description": "端到端学习方向矩阵，优化符号保持和簇分离",
+  "dimension_selection": {
+    "method": "learned_directions",
+    "k": 4
+  },
+  "direction_generation": {
+    "d": 768,
+    "k": 4
+  },
+  "learning": {
+    "num_variants_per_code": 100,
+    "num_attacks_subsample": -1,
+    "epochs": 100,
+    "batch_size": 4,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "threshold_strategy": {
+      "use_quantile": true,
+      "quantile": 0.6,
+      "method": "selective_dims"
+    },
+    "loss_weights": {
+      "sign_preservation": 5.0,
+      "cluster_separation": 2.0,
+      "orthogonality": 1.0,
+      "compactness": 0.5
+    }
+  }
+}
+
