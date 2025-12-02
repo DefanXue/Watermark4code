@@ -1,0 +1,10 @@
+{
+  "rename_mapping": {
+    "var_a98o": "var_th1y",
+    "var_xyh6": "var_dszr"
+  },
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.assign_update",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_r0lh": "var_nkbg"
+  },
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound",
+    "ConditionTransformer:ConditionTransformer.ternary"
+  ]
+}

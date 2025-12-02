@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_oskd": "var_uksg"
+  },
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case",
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.negated"
+  ]
+}

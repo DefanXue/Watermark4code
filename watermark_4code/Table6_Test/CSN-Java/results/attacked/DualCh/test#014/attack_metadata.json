@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "VarInitTransformer:VarInitTransformer.split",
+    "ConditionTransformer:ConditionTransformer.switch"
+  ]
+}

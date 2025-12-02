@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.assign_update",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use"
+  ]
+}

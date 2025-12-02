@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "LoopTransformer:LoopTransformer.while_loop"
+  ]
+}

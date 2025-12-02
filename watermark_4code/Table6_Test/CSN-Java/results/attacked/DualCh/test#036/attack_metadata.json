@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_kysm": "var_gmva"
+  },
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "UpdateTransformer:UpdateTransformer.prefix_update"
+  ]
+}

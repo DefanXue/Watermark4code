@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_xbjh": "var_4z5i"
+  },
+  "transforms": [
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge",
+    "ConditionTransformer:ConditionTransformer.ternary"
+  ]
+}

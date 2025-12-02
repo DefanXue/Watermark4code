@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound",
+    "UpdateTransformer:UpdateTransformer.binop_update"
+  ]
+}

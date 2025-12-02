@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true",
+    "UpdateTransformer:UpdateTransformer.postfix_update"
+  ]
+}

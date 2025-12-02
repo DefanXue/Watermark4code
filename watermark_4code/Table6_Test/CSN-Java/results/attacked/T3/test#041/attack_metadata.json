@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "LoopTransformer:LoopTransformer.while_loop",
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case"
+  ]
+}

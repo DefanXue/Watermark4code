@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.assign_update",
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound"
+  ]
+}

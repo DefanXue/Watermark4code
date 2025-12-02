@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.pascal_case",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split"
+  ]
+}

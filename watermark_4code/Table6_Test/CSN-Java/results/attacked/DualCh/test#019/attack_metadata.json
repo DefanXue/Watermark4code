@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_4cti": "var_82hf"
+  },
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start",
+    "UpdateTransformer:UpdateTransformer.postfix_update"
+  ]
+}

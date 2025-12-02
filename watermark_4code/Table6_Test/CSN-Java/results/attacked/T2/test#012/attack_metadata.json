@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound",
+    "ConditionTransformer:ConditionTransformer.switch"
+  ]
+}

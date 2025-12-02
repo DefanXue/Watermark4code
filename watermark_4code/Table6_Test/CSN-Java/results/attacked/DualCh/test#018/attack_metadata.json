@@ -1,0 +1,16 @@
+{
+  "rename_mapping": {
+    "var_4pri": "var_cmxt",
+    "var_50pq": "var_qqbq",
+    "var_66tc": "var_jyvc",
+    "var_76tv": "var_1pbd",
+    "var_8jhk": "var_593b",
+    "var_oyuq": "var_0ia0",
+    "var_p0ei": "var_p6uq",
+    "var_zqek": "var_hkl9"
+  },
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case"
+  ]
+}

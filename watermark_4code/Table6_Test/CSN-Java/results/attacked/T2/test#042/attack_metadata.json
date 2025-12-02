@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.ternary",
+    "UpdateTransformer:UpdateTransformer.postfix_update"
+  ]
+}

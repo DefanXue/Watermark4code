@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_3v1h": "var_4xde"
+  },
+  "transforms": [
+    "LoopTransformer:LoopTransformer.for_loop",
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.negated"
+  ]
+}

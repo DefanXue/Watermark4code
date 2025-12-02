@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge",
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case",
+    "UpdateTransformer:UpdateTransformer.postfix_update"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge"
+  ]
+}

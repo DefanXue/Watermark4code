@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.negated",
+    "UpdateTransformer:UpdateTransformer.assign_update",
+    "UpdateTransformer:UpdateTransformer.prefix_update"
+  ]
+}

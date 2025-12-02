@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_634m": "var_c1fu"
+  },
+  "transforms": [
+    "LoopTransformer:LoopTransformer.for_loop",
+    "UpdateTransformer:UpdateTransformer.postfix_update"
+  ]
+}

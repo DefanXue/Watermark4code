@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_5zqt": "var_qjow"
+  },
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use",
+    "ConditionTransformer:ConditionTransformer.switch"
+  ]
+}

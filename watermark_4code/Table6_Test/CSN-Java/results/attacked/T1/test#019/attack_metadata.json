@@ -1,0 +1,5 @@
+{
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use"
+  ]
+}

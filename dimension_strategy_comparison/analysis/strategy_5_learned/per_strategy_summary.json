@@ -1,0 +1,103 @@
+{
+  "strategy_5_learned": {
+    "strategy": "strategy_5_learned",
+    "metrics_by_attack_type": {
+      "dual_channel": {
+        "attack_type": "dual_channel",
+        "num_samples": 1000,
+        "success_rate": 0.339,
+        "avg_bit_accuracy": 0.703,
+        "avg_codebleu": 0.9325223127466493,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 0.707,
+          "avg_magnitude_retention": 1.0000262411619552
+        },
+        "success_count": 339
+      },
+      "rename_0.00": {
+        "attack_type": "rename_0.00",
+        "num_samples": 1000,
+        "success_rate": 0.95,
+        "avg_bit_accuracy": 0.9875,
+        "avg_codebleu": 1.0,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 1.0,
+          "avg_magnitude_retention": 0.9999999495660067
+        },
+        "success_count": 950
+      },
+      "rename_0.40": {
+        "attack_type": "rename_0.40",
+        "num_samples": 1000,
+        "success_rate": 0.858,
+        "avg_bit_accuracy": 0.9565,
+        "avg_codebleu": 0.9688685823152422,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 0.969,
+          "avg_magnitude_retention": 0.9537262899362247
+        },
+        "success_count": 858
+      },
+      "rename_0.75": {
+        "attack_type": "rename_0.75",
+        "num_samples": 1000,
+        "success_rate": 0.837,
+        "avg_bit_accuracy": 0.94875,
+        "avg_codebleu": 0.962126081684126,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 0.96125,
+          "avg_magnitude_retention": 0.9472086656442467
+        },
+        "success_count": 837
+      },
+      "rename_1.00": {
+        "attack_type": "rename_1.00",
+        "num_samples": 1000,
+        "success_rate": 0.805,
+        "avg_bit_accuracy": 0.93725,
+        "avg_codebleu": 0.9511909848600324,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 0.94975,
+          "avg_magnitude_retention": 0.9342148979017733
+        },
+        "success_count": 805
+      },
+      "t_transform_1": {
+        "attack_type": "t_transform_1",
+        "num_samples": 1000,
+        "success_rate": 0.486,
+        "avg_bit_accuracy": 0.77175,
+        "avg_codebleu": 0.9809216594216473,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 0.77475,
+          "avg_magnitude_retention": 0.879478697071693
+        },
+        "success_count": 486
+      },
+      "t_transform_2": {
+        "attack_type": "t_transform_2",
+        "num_samples": 1000,
+        "success_rate": 0.46,
+        "avg_bit_accuracy": 0.75925,
+        "avg_codebleu": 0.9630738945015809,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 0.76325,
+          "avg_magnitude_retention": 1.0349071584847656
+        },
+        "success_count": 460
+      },
+      "t_transform_3": {
+        "attack_type": "t_transform_3",
+        "num_samples": 1000,
+        "success_rate": 0.428,
+        "avg_bit_accuracy": 0.73175,
+        "avg_codebleu": 0.9346374338312121,
+        "offset_preservation": {
+          "avg_sign_preservation_rate": 0.73625,
+          "avg_magnitude_retention": 1.7850888191337049
+        },
+        "success_count": 428
+      }
+    }
+  }
+}

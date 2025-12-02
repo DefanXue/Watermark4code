@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "LoopTransformer:LoopTransformer.while_loop",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start"
+  ]
+}

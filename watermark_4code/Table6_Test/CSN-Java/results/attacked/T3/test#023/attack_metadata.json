@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.switch",
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "VarNameStyleTransformer:VarNameStyleTransformer.pascal_case"
+  ]
+}

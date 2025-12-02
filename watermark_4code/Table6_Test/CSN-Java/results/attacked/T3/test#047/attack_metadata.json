@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "LoopTransformer:LoopTransformer.for_loop",
+    "UpdateTransformer:UpdateTransformer.binop_update",
+    "UpdateTransformer:UpdateTransformer.assign_update"
+  ]
+}

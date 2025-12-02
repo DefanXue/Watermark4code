@@ -1,0 +1,264 @@
+{
+  "NoAttack": {
+    "bitacc": 1.0,
+    "msgacc": 1.0,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 1.0,
+        "msgacc": 1.0,
+        "correct_bits": 200,
+        "total_bits": 200,
+        "correct_messages": 50,
+        "total_messages": 50,
+        "skipped_samples": []
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "T1": {
+    "bitacc": 0.8085106382978723,
+    "msgacc": 0.5319148936170213,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.8085106382978723,
+        "msgacc": 0.5319148936170213,
+        "correct_bits": 152,
+        "total_bits": 188,
+        "correct_messages": 25,
+        "total_messages": 47,
+        "skipped_samples": [
+          "test#006",
+          "test#007",
+          "test#048"
+        ]
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "T2": {
+    "bitacc": 0.8085106382978723,
+    "msgacc": 0.5319148936170213,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.8085106382978723,
+        "msgacc": 0.5319148936170213,
+        "correct_bits": 152,
+        "total_bits": 188,
+        "correct_messages": 25,
+        "total_messages": 47,
+        "skipped_samples": [
+          "test#007",
+          "test#006",
+          "test#048"
+        ]
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "T3": {
+    "bitacc": 0.776595744680851,
+    "msgacc": 0.46808510638297873,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.776595744680851,
+        "msgacc": 0.46808510638297873,
+        "correct_bits": 146,
+        "total_bits": 188,
+        "correct_messages": 22,
+        "total_messages": 47,
+        "skipped_samples": [
+          "test#006",
+          "test#007",
+          "test#048"
+        ]
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "V25": {
+    "bitacc": 0.9605263157894737,
+    "msgacc": 0.868421052631579,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.9605263157894737,
+        "msgacc": 0.868421052631579,
+        "correct_bits": 146,
+        "total_bits": 152,
+        "correct_messages": 33,
+        "total_messages": 38,
+        "skipped_samples": [
+          "test#004",
+          "test#012",
+          "test#014",
+          "test#017",
+          "test#023",
+          "test#024",
+          "test#025",
+          "test#032",
+          "test#033",
+          "test#034",
+          "test#038",
+          "test#049"
+        ]
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "V50": {
+    "bitacc": 0.9473684210526315,
+    "msgacc": 0.8421052631578947,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.9473684210526315,
+        "msgacc": 0.8421052631578947,
+        "correct_bits": 144,
+        "total_bits": 152,
+        "correct_messages": 32,
+        "total_messages": 38,
+        "skipped_samples": [
+          "test#004",
+          "test#012",
+          "test#014",
+          "test#017",
+          "test#023",
+          "test#024",
+          "test#025",
+          "test#032",
+          "test#033",
+          "test#034",
+          "test#038",
+          "test#049"
+        ]
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "V75": {
+    "bitacc": 0.9210526315789473,
+    "msgacc": 0.7631578947368421,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.9210526315789473,
+        "msgacc": 0.7631578947368421,
+        "correct_bits": 140,
+        "total_bits": 152,
+        "correct_messages": 29,
+        "total_messages": 38,
+        "skipped_samples": [
+          "test#004",
+          "test#012",
+          "test#014",
+          "test#017",
+          "test#023",
+          "test#024",
+          "test#025",
+          "test#032",
+          "test#033",
+          "test#034",
+          "test#038",
+          "test#049"
+        ]
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "V100": {
+    "bitacc": 0.9078947368421053,
+    "msgacc": 0.7368421052631579,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.9078947368421053,
+        "msgacc": 0.7368421052631579,
+        "correct_bits": 138,
+        "total_bits": 152,
+        "correct_messages": 28,
+        "total_messages": 38,
+        "skipped_samples": [
+          "test#004",
+          "test#012",
+          "test#014",
+          "test#017",
+          "test#023",
+          "test#024",
+          "test#025",
+          "test#032",
+          "test#033",
+          "test#034",
+          "test#038",
+          "test#049"
+        ]
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  },
+  "DualCh": {
+    "bitacc": 0.715,
+    "msgacc": 0.4,
+    "codebleu": 0.0,
+    "mrr": 0.0,
+    "details": {
+      "accuracy": {
+        "bitacc": 0.715,
+        "msgacc": 0.4,
+        "correct_bits": 143,
+        "total_bits": 200,
+        "correct_messages": 20,
+        "total_messages": 50,
+        "skipped_samples": []
+      },
+      "codebleu": {},
+      "mrr": {
+        "mrr": 0.0,
+        "note": "MRR需要docstring和完整代码搜索实现"
+      }
+    }
+  }
+}

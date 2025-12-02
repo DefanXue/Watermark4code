@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_du0k": "var_o7m8"
+  },
+  "transforms": [
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split",
+    "VarNameStyleTransformer:VarNameStyleTransformer.camel_case"
+  ]
+}

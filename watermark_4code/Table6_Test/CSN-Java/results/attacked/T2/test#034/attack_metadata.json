@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.switch",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start"
+  ]
+}

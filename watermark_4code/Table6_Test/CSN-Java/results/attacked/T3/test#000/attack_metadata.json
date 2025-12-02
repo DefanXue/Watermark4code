@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.assign_update",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true"
+  ]
+}

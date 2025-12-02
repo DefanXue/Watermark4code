@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {
+    "var_ekf0": "var_hc2l",
+    "var_v8v0": "var_4e9u",
+    "var_xbjh": "var_4z5i"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1",
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "ConditionTransformer:ConditionTransformer.ternary"
+  ]
+}

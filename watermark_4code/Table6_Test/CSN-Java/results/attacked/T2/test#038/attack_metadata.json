@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.prefix_update",
+    "UpdateTransformer:UpdateTransformer.binop_update"
+  ]
+}

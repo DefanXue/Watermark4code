@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "LoopTransformer:LoopTransformer.while_loop",
+    "VarInitTransformer:VarInitTransformer.split",
+    "UpdateTransformer:UpdateTransformer.postfix_update"
+  ]
+}

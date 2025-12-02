@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true",
+    "LoopTransformer:LoopTransformer.while_loop"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_vklc": "var_jev1"
+  },
+  "transforms": [
+    "VarInitTransformer:VarInitTransformer.merge",
+    "VarNameStyleTransformer:VarNameStyleTransformer.pascal_case"
+  ]
+}

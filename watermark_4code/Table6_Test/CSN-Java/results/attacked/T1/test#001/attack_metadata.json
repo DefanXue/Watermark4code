@@ -1,0 +1,5 @@
+{
+  "transforms": [
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge"
+  ]
+}

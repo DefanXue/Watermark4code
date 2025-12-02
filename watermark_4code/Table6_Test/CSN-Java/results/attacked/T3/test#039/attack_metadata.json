@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1",
+    "UpdateTransformer:UpdateTransformer.assign_update"
+  ]
+}

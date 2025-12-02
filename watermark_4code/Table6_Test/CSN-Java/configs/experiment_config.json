@@ -1,0 +1,33 @@
+{
+  "experiment_name": "Table6_Robustness_Evaluation",
+  "dataset": "CSN-Java",
+  "num_samples": 100,
+  "watermark": {
+    "bits": [1, 1, 0, 0],
+    "num_bits": 4
+  },
+  "model": {
+    "model_dir": "../../best_model",
+    "secret_key": "XDF",
+    "max_length": 512,
+    "batch_size": 2
+  },
+  "embedding": {
+    "max_iters": 80,
+    "K": 40,
+    "quantile": 0.99
+  },
+  "attacks": {
+    "transform_attacks": ["T1", "T2", "T3"],
+    "variable_attacks": ["V25", "V50", "V75", "V100"],
+    "dual_channel": ["DualCh"]
+  },
+  "metrics": [
+    "BitAcc",
+    "MsgAcc",
+    "MRR",
+    "CodeBLEU"
+  ],
+  "note": "This experiment replicates Table 6 from SrcMarker paper (IEEE S&P 2024) using Watermark4code method with Random dimension + Median extraction"
+}
+

@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case",
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case"
+  ]
+}

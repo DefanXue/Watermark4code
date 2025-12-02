@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.camel_case",
+    "UpdateTransformer:UpdateTransformer.prefix_update",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split"
+  ]
+}

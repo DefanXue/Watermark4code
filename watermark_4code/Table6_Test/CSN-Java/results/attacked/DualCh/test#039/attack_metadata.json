@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_hdui": "var_yweu"
+  },
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.ternary",
+    "VarInitTransformer:VarInitTransformer.merge"
+  ]
+}

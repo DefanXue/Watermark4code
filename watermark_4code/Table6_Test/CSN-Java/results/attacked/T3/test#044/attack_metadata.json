@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "rename_mapping": {
+    "var_ck5n": "var_248i",
+    "var_yekg": "var_pj29"
+  },
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.ternary",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge"
+  ]
+}

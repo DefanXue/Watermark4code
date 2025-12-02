@@ -1,0 +1,139 @@
+{
+  "dataset": "CSN-Java",
+  "num_samples": 50,
+  "num_bits": 4,
+  "watermark": [
+    1,
+    1,
+    0,
+    0
+  ],
+  "results": {
+    "No Attack": {
+      "SrcMarker (论文)": {
+        "BitAcc": 97.26,
+        "MsgAcc": 92.74,
+        "MRR": 0.8137,
+        "CodeBLEU": null
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 100.0,
+        "MsgAcc": 100.0,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "T1": {
+      "SrcMarker (论文)": {
+        "BitAcc": 83.5,
+        "MsgAcc": null,
+        "MRR": 0.8168,
+        "CodeBLEU": 0.8589
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 82.0,
+        "MsgAcc": 56.00000000000001,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "T2": {
+      "SrcMarker (论文)": {
+        "BitAcc": 77.04,
+        "MsgAcc": null,
+        "MRR": 0.8159,
+        "CodeBLEU": 0.7907
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 82.0,
+        "MsgAcc": 56.00000000000001,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "T3": {
+      "SrcMarker (论文)": {
+        "BitAcc": 75.07,
+        "MsgAcc": null,
+        "MRR": 0.8189,
+        "CodeBLEU": 0.7678
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 79.0,
+        "MsgAcc": 50.0,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "V25": {
+      "SrcMarker (论文)": {
+        "BitAcc": 84.08,
+        "MsgAcc": null,
+        "MRR": 0.8145,
+        "CodeBLEU": 0.915
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 97.0,
+        "MsgAcc": 90.0,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "V50": {
+      "SrcMarker (论文)": {
+        "BitAcc": 79.89,
+        "MsgAcc": null,
+        "MRR": 0.8019,
+        "CodeBLEU": 0.8853
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 96.0,
+        "MsgAcc": 88.0,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "V75": {
+      "SrcMarker (论文)": {
+        "BitAcc": 73.71,
+        "MsgAcc": null,
+        "MRR": 0.791,
+        "CodeBLEU": 0.8464
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 94.0,
+        "MsgAcc": 82.0,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "V100": {
+      "SrcMarker (论文)": {
+        "BitAcc": 62.68,
+        "MsgAcc": null,
+        "MRR": 0.7845,
+        "CodeBLEU": 0.7855
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 93.0,
+        "MsgAcc": 80.0,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    },
+    "DualCh": {
+      "SrcMarker (论文)": {
+        "BitAcc": 67.76,
+        "MsgAcc": null,
+        "MRR": 0.7984,
+        "CodeBLEU": 0.7674
+      },
+      "Watermark4code (实验)": {
+        "BitAcc": 71.5,
+        "MsgAcc": 40.0,
+        "MRR": 0.0,
+        "CodeBLEU": 0.0
+      }
+    }
+  }
+}

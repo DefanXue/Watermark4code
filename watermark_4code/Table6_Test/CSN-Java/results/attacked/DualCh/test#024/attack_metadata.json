@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true"
+  ]
+}

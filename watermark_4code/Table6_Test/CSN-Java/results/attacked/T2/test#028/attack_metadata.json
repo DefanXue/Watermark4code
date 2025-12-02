@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true",
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound"
+  ]
+}

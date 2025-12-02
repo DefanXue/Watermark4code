@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "LoopTransformer:LoopTransformer.while_loop",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge",
+    "VarInitTransformer:VarInitTransformer.split"
+  ]
+}

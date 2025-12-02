@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "LoopTransformer:LoopTransformer.for_loop",
+    "LoopTransformer:LoopTransformer.while_loop"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.camel_case",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start"
+  ]
+}

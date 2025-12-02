@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "VarInitTransformer:VarInitTransformer.split",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1"
+  ]
+}

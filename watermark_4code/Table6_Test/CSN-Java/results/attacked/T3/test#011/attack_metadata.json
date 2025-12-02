@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split"
+  ]
+}

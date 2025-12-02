@@ -1,0 +1,11 @@
+{
+  "rename_mapping": {
+    "var_0yfp": "var_4wvj",
+    "var_n97o": "var_6kj0",
+    "var_vq69": "var_j9jm"
+  },
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.assign_update",
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case"
+  ]
+}

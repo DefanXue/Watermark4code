@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case"
+  ]
+}

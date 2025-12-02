@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_geua": "var_8ryu"
+  },
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.prefix_update",
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound"
+  ]
+}

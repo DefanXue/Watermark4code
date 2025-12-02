@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.negated",
+    "LoopTransformer:LoopTransformer.for_loop"
+  ]
+}

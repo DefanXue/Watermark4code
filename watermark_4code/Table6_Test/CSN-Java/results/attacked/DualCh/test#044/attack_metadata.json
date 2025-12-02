@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_yflv": "var_jy3d"
+  },
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "UpdateTransformer:UpdateTransformer.prefix_update"
+  ]
+}

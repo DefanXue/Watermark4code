@@ -1,0 +1,5 @@
+{
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "ConditionTransformer:ConditionTransformer.switch",
+    "LoopTransformer:LoopTransformer.while_loop"
+  ]
+}

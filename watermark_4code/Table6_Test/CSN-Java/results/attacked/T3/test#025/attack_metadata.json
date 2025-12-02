@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true"
+  ]
+}

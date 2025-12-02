@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1",
+    "VarInitTransformer:VarInitTransformer.merge"
+  ]
+}

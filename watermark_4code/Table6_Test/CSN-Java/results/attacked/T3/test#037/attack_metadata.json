@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.binop_update",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use"
+  ]
+}

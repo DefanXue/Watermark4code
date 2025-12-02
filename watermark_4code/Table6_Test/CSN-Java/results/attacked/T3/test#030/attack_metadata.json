@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true",
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "VarNameStyleTransformer:VarNameStyleTransformer.pascal_case"
+  ]
+}

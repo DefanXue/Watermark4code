@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_qswh": "var_77o4"
+  },
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start",
+    "CompoundIfTransformer:CompoundIfTransformer.if_nested"
+  ]
+}

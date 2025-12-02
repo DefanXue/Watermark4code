@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.switch",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1"
+  ]
+}

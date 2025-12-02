@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use",
+    "VarNameStyleTransformer:VarNameStyleTransformer.camel_case"
+  ]
+}

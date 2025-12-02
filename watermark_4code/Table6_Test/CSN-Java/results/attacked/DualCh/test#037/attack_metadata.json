@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_45va": "var_5eqi"
+  },
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use"
+  ]
+}

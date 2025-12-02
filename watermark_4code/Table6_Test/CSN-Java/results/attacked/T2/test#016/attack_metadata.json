@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case",
+    "UpdateTransformer:UpdateTransformer.binop_update"
+  ]
+}

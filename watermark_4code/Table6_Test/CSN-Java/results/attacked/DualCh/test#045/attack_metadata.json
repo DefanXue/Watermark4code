@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_t6vk": "var_mgrn"
+  },
+  "transforms": [
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.merge"
+  ]
+}

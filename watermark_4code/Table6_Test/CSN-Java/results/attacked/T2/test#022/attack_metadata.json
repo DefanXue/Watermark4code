@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarInitTransformer:VarInitTransformer.merge",
+    "VarInitTransformer:VarInitTransformer.split"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_bigj": "var_fhjf"
+  },
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_nested",
+    "UpdateTransformer:UpdateTransformer.assign_update"
+  ]
+}

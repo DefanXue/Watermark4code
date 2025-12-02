@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_ut3t": "var_ku3t"
+  },
+  "transforms": [
+    "LoopTransformer:LoopTransformer.while_loop",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split"
+  ]
+}

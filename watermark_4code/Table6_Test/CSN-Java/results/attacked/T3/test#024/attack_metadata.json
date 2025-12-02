@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "LoopTransformer:LoopTransformer.while_loop",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1"
+  ]
+}

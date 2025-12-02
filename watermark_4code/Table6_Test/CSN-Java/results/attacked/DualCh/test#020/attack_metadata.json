@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_5df2": "var_2538"
+  },
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.assign_update",
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal"
+  ]
+}

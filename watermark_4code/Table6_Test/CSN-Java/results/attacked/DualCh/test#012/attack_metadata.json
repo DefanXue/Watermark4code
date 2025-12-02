@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case",
+    "VarInitTransformer:VarInitTransformer.merge"
+  ]
+}

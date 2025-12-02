@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "VarInitTransformer:VarInitTransformer.merge",
+    "LoopTransformer:LoopTransformer.while_loop",
+    "VarNameStyleTransformer:VarNameStyleTransformer.pascal_case"
+  ]
+}

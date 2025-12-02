@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_nested",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split",
+    "VarNameStyleTransformer:VarNameStyleTransformer.camel_case"
+  ]
+}

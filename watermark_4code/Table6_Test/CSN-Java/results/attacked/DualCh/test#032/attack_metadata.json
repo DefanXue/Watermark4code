@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.postfix_update",
+    "VarInitTransformer:VarInitTransformer.merge"
+  ]
+}

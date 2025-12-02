@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_nested",
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.negated",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1"
+  ]
+}

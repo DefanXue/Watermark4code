@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use",
+    "UpdateTransformer:UpdateTransformer.binop_update"
+  ]
+}

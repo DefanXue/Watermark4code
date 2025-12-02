@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.switch",
+    "UpdateTransformer:UpdateTransformer.prefix_update"
+  ]
+}

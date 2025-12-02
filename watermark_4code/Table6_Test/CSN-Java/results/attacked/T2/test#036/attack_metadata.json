@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case",
+    "ConditionTransformer:ConditionTransformer.switch"
+  ]
+}

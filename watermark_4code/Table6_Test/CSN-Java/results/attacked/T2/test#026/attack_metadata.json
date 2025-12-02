@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start",
+    "UpdateTransformer:UpdateTransformer.prefix_update"
+  ]
+}

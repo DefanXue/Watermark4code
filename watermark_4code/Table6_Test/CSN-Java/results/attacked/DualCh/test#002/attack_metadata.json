@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_d56n": "var_lomn"
+  },
+  "transforms": [
+    "LoopTransformer:LoopTransformer.for_loop",
+    "VarInitTransformer:VarInitTransformer.split"
+  ]
+}

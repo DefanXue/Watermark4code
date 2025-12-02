@@ -1,0 +1,7 @@
+{
+  "rename_mapping": {},
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_nested",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use"
+  ]
+}

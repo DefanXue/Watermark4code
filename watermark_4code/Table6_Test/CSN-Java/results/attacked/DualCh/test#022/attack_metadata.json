@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_gvyi": "var_cwk6"
+  },
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start"
+  ]
+}

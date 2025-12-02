@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_04tj": "var_x7ig"
+  },
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_1"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "x_axis": "attack_ratio",
+  "y_axis": "success_rate",
+  "attack_type": "rename",
+  "curves": {
+    "strategy_5_learned": [
+      {
+        "x": 0.0,
+        "y": 0.95
+      },
+      {
+        "x": 0.4,
+        "y": 0.858
+      },
+      {
+        "x": 0.75,
+        "y": 0.837
+      },
+      {
+        "x": 1.0,
+        "y": 0.805
+      }
+    ]
+  }
+}

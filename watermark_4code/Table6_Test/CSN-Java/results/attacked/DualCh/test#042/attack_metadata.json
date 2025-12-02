@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_4zhe": "var_3ex7"
+  },
+  "transforms": [
+    "VarInitTransformer:VarInitTransformer.merge",
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case"
+  ]
+}

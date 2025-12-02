@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.ternary",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start"
+  ]
+}

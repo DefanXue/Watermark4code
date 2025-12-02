@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_i6v3": "var_m60u"
+  },
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use",
+    "ConditionTransformer:ConditionTransformer.ternary"
+  ]
+}

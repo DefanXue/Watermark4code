@@ -1,0 +1,84 @@
+# 对比学习项目默认配置文件
+
+# 模型配置
+model:
+  name: "Salesforce/codet5-base"  # 预训练模型名称，从CodeBERT改为CodeT5
+  projection_dim: 128              # 投影头输出维度
+  projection_hidden_dim: 512       # 投影头隐藏层维度
+  pooling_strategy: "mean"         # 池化策略：'mean', 'cls', 或 'max'
+  use_quantization: true           # 新增：是否启用4位量化（QLoRA）
+  
+  # PEFT/LoRA 配置
+  lora_r: 16                       # LoRA适配器秩
+  lora_alpha: 32                   # LoRA缩放因子
+  lora_dropout: 0.1                # LoRA dropout率
+  target_modules:                  # 应用LoRA的模块（适配T5模型的模块名）
+    - "q"
+    - "k"
+    - "v"
+    - "o"
+    - "wi"
+    - "wo"
+
+# 数据配置
+data:
+  train_path: "contrastive_learning/datasets/csn_java/train_augmented_pairs_simple.jsonl"
+  val_path:   "contrastive_learning/datasets/csn_java/valid_augmented_pairs_simple.jsonl"
+  test_path:  "contrastive_learning/datasets/csn_java/test_augmented_pairs_simple.jsonl"
+  max_length: 512                                       # 最大序列长度
+
+# 增强策略配置
+augmentation:
+  strategies:                      # 代码增强策略及其应用概率
+    rename_variables: 0.8
+    insert_comments: 0.3
+    reorder_statements: 0.5
+    change_whitespace: 0.7
+    reformat_code: 0.6
+    convert_for_while: 0.4
+
+# 新增：损失函数配置
+loss:
+  temperature: 0.07                # InfoNCE损失的温度参数
+  consistency_lambda: 0.2          # 编码器一致性损失的权重（略提高）
+  lambda_warmup_steps: 500         # λ权重从0增加到目标值的步数（更快介入）
+  normalize_losses: true           # 启用损失归一化
+  # 新增：编码器端InfoNCE
+  use_encoder_infonce: true
+  encoder_infonce_lambda: 0.5
+  encoder_infonce_warmup_steps: 1000
+  temperature_encoder: 0.20
+  pos_weight: 1.2
+  # 新增：归一化策略（EMA尺度归一）
+  normalization_method: "ema_div"
+  ema_beta: 0.99
+  eps: 1.0e-8
+optimizer:
+  lora_lr: 7.0e-5                  # LoRA参数学习率（略提高）
+  projection_head_lr: 5.0e-5       # 投影头参数学习率（略降低）
+  weight_decay: 0.01               # 权重衰减
+
+# 训练配置
+training:
+  seed: 42                         # 随机种子
+  batch_size: 64                   # 批量大小 (已增大，因为QLoRA节省了显存)
+  gradient_accumulation_steps: 1   # 梯度累积步数
+  max_grad_norm: 1.0               # 梯度裁剪阈值
+  learning_rate: 5.0e-5            # 学习率 (若使用参数分组，此值不使用)
+  weight_decay: 0.01               # 权重衰减 (若使用参数分组，此值不使用)
+  num_epochs: 10                   # 训练轮数
+  warmup_ratio: 0.1                # 预热步数比例
+  use_amp: true                    # 启用混合精度训练，与QLoRA配合使用
+  output_dir: "./output"           # 输出目录
+  logging_steps: 100               # 日志记录步数
+  eval_steps: 1000                 # 评估步数
+  save_steps: 1000                 # 保存步数
+  num_workers: 4                   # 数据加载线程数
+
+# 评估配置
+evaluation:
+  batch_size: 128                  # 评估批量大小 (已增大，因为QLoRA节省了显存)
+  num_workers: 4                   # 数据加载线程数
+  mode: "encoder_only"             # 评估模式："encoder_only"（只使用编码器）或"full_model"（使用投影头）
+  use_validation_threshold: true   # 是否使用验证集上找到的最佳阈值进行测试
+  threshold_range: [-1.0, 1.0]     # 阈值搜索范围，覆盖余弦相似度全范围 

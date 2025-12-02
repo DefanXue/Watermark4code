@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split",
+    "LoopTransformer:LoopTransformer.while_loop"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.switch",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use",
+    "ConditionTransformer:ConditionTransformer.ternary"
+  ]
+}

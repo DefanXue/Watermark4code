@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.ternary",
+    "SameTypeDeclarationTransformer:SameTypeDeclarationTransformer.split",
+    "LoopTransformer:LoopTransformer.while_loop"
+  ]
+}

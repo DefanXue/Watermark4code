@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "UpdateTransformer:UpdateTransformer.binop_update",
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal"
+  ]
+}

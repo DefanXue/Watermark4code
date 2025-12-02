@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.negated",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start",
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.first_use"
+  ]
+}

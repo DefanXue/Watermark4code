@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_kbx0": "var_5t4m"
+  },
+  "transforms": [
+    "IfBlockSwapTransformer:IfBlockSwapTransformer.normal",
+    "InfiniteLoopTransformer:InfiniteLoopTransformer.literal_true"
+  ]
+}

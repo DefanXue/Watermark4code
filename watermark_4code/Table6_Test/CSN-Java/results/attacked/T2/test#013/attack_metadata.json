@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarDeclLocationTransformer:VarDeclLocationTransformer.block_start",
+    "VarInitTransformer:VarInitTransformer.split"
+  ]
+}

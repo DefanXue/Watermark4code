@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "CompoundIfTransformer:CompoundIfTransformer.if_nested",
+    "VarInitTransformer:VarInitTransformer.merge",
+    "ConditionTransformer:ConditionTransformer.switch"
+  ]
+}

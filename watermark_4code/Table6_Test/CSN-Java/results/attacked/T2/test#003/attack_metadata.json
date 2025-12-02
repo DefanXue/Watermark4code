@@ -1,0 +1,6 @@
+{
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.pascal_case",
+    "UpdateTransformer:UpdateTransformer.assign_update"
+  ]
+}

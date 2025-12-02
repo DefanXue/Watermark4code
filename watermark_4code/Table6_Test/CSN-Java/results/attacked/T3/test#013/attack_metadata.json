@@ -1,0 +1,7 @@
+{
+  "transforms": [
+    "ConditionTransformer:ConditionTransformer.ternary",
+    "CompoundIfTransformer:CompoundIfTransformer.if_compound",
+    "VarNameStyleTransformer:VarNameStyleTransformer.underscore_case"
+  ]
+}

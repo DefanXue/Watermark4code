@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_dk4y": "var_epxl"
+  },
+  "transforms": [
+    "VarNameStyleTransformer:VarNameStyleTransformer.pascal_case",
+    "VarNameStyleTransformer:VarNameStyleTransformer.snake_case"
+  ]
+}

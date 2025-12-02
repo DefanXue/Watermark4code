@@ -1,0 +1,9 @@
+{
+  "rename_mapping": {
+    "var_n3sb": "var_zbs8"
+  },
+  "transforms": [
+    "LoopTransformer:LoopTransformer.while_loop",
+    "VarNameStyleTransformer:VarNameStyleTransformer.camel_case"
+  ]
+}
